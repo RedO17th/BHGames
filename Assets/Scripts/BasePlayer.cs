@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 public interface IPlayer : IActivatable, IDeactivatable, IMovable
 {
     void Initialize();
-
-    Vector3 Position { get; }
 }
 
 public class BasePlayer : MonoBehaviour, IPlayer
@@ -15,6 +13,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
     [Header("Controllers")]
     [SerializeField] private BasePlayerController[] _controllers;
 
+    public Vector3 Forward => transform.forward;
     public Vector3 Position
     {
         get => transform.position;
