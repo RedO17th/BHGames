@@ -11,7 +11,8 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     private IMovementController _movementController = null;
 
-    private IMovable _movable = null;
+    private ICamera _camera = null;
+    private IPlayer _player = null;
     private IPlayerMovementInput _input = null;
 
     private Vector3 _direction = Vector3.zero;
@@ -21,9 +22,11 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     {
         _movementController = controller as IMovementController;
 
-        _movable = _movementController.Movable;
+        _player = _movementController.Player;
 
         _input = GetComponent<IPlayerMovementInput>();
+
+        _camera = _player.GetController<ICameraController>().Camera;
     }
 
     public void Enable() => enabled = true;
@@ -36,7 +39,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         Move();
     }
 
-    private void GetInputDirection() => _direction = _input.Direction;
+    private void GetInputDirection() => _direction = _camera.YRotation * _input.Direction;
     private void Rotate()
     {
         _directionRotation = new Vector3(_direction.x, 0f, _direction.z);
@@ -45,12 +48,12 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
             var rotation = Quaternion.LookRotation(_directionRotation);
             var targetRotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotation);
 
-            _movable.Rotate(targetRotation);
+            _player.Rotate(targetRotation);
         }
     }
     private void Move()
     {
-        _movable.Move(_direction * _movementSpeed * Time.deltaTime);
+        _player.Move(_direction * _movementSpeed * Time.deltaTime);
     }
 
     public void Disable() => enabled = false;

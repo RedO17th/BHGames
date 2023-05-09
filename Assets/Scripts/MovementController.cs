@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IMovementController
 {
-    IMovable Movable { get; }
+    IPlayer Player { get; }
     T GetMechanic<T>() where T : class;
 }
 
@@ -12,11 +12,11 @@ public class MovementController : BasePlayerController, IMovementController
 {
     [SerializeField] private BaseMovementMechanic[] _mechanics;
 
-    public IMovable Movable { get; private set; } = null;
+    public IPlayer Player { get; private set; } = null;
 
     public override void Initialize(IPlayer player)
     {
-        Movable = player;
+        Player = player;
 
         DefineMechanics();
         InitializeMechanics();

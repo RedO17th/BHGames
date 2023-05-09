@@ -21,7 +21,7 @@ public class DashMechanic : BaseMovementMechanic
     {
         _movementController = controller as IMovementController;
         
-        _movable = _movementController.Movable;
+        _movable = _movementController.Player;
 
         _input = GetComponent<IPlayerDashInput>();
 

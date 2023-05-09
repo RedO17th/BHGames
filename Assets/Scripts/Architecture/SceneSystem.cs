@@ -37,8 +37,6 @@ public abstract class BaseSceneSystem : MonoBehaviour, ISceneSystem
 
 public class SceneSystem : BaseSceneSystem
 {
-
-
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))

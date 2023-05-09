@@ -6,11 +6,11 @@ using UnityEngine.UIElements;
 public interface IPlayer : IActivatable, IDeactivatable, IMovable
 {
     void Initialize();
+    T GetController<T>() where T : class;
 }
 
 public class BasePlayer : MonoBehaviour, IPlayer
 {
-    [Header("Controllers")]
     [SerializeField] private BasePlayerController[] _controllers;
 
     public Vector3 Forward => transform.forward;
@@ -21,11 +21,26 @@ public class BasePlayer : MonoBehaviour, IPlayer
     }
 
     public virtual void Initialize() => InitializeControllers();
-
     private void InitializeControllers()
     {
         foreach (var controller in _controllers)
             controller.Initialize(this);
+    }
+
+    public virtual T GetController<T>() where T : class
+    {
+        T result = null;
+
+        foreach (var controller in _controllers)
+        {
+            if (controller is T mech)
+            {
+                result = mech;
+                break;
+            }
+        }
+
+        return result;
     }
 
     public void SetPosition(Vector3 position) => Position = position;
