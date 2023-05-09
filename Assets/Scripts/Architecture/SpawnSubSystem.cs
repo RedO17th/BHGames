@@ -10,9 +10,23 @@ public class SpawnSubSystem : BaseSubSystem
 
     private SceneSystem _sceneSystem = null;
 
+    private List<ISpawnPoint> _freePoints;
+
     public override void Initialize(ISceneSystem sceneSystem)
     {
         _sceneSystem = sceneSystem as SceneSystem;
+
+        InitializeFreePoints();
+    }
+
+    private void InitializeFreePoints()
+    {
+        _freePoints = new List<ISpawnPoint>();
+
+        foreach (var point in _points)
+        {
+            _freePoints.Add(point);
+        }
     }
 
     public override void Prepare()
@@ -45,15 +59,11 @@ public class SpawnSubSystem : BaseSubSystem
     {
         ISpawnPoint result = null;
 
-        foreach (var point in _points)
+        if (_freePoints.Count > 0)
         {
-            if (point.IsBusy == false)
-            {
-                result = point;
-                result.SetBusyState();
+            result = _freePoints[Random.Range(0, _freePoints.Count)];
 
-                break;
-            }
+            _freePoints.Remove(result);
         }
 
         return result;
