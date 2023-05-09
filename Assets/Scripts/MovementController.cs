@@ -2,47 +2,49 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovementController : BasePlayerController
+public interface IMovementController
 {
-    [SerializeField] private float _movementSpeed = 0f;
-    [SerializeField] private float _speedRotation = 0f;
+    IMovable Movable { get; }
+    T GetMechanic<T>() where T : class;
+}
 
-    private IMovable _movable = null;
+public class MovementController : BasePlayerController, IMovementController
+{
+    [SerializeField] private BaseMovementMechanic[] _mechanics;
 
-    private IPlayerKeyBoardInput _input = null;
-
-    private Vector3 _direction = Vector3.zero;
-    private Vector3 _directionRotation = Vector3.zero;
+    public IMovable Movable { get; private set; } = null;
 
     public override void Initialize(IPlayer player)
     {
-        _movable = player;
+        Movable = player;
 
-        _input = GetComponent<IPlayerKeyBoardInput>();
+        DefineMechanics();
+        InitializeMechanics();
     }
 
-    private void Update() => ProcessInputAndMove();
-    private void ProcessInputAndMove()
+    private void DefineMechanics()
     {
-        GetInputDirection();
-        Rotate();
-        Move();
+        _mechanics = GetComponents<BaseMovementMechanic>();
+    }
+    private void InitializeMechanics()
+    {
+        foreach (var mechanic in _mechanics)
+            mechanic.Initialize(this);
     }
 
-    private void GetInputDirection() => _direction = _input.Direction;
-    private void Rotate()
+    public virtual T GetMechanic<T>() where T : class
     {
-        _directionRotation = new Vector3(_direction.x, 0f, _direction.z);
-        if (_directionRotation.magnitude != 0f)
+        T result = null;
+
+        foreach (var mechanic in _mechanics)
         {
-            var rotation = Quaternion.LookRotation(_directionRotation);
-            var targetRotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotation);
-
-            _movable.Rotate(targetRotation);
+            if (mechanic is T mech)
+            {
+                result = mech;
+                break;
+            }
         }
-    }
-    private void Move()
-    {
-        _movable.Move(_direction * _movementSpeed * Time.deltaTime);
+
+        return result;
     }
 }

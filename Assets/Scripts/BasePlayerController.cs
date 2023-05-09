@@ -2,7 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BasePlayerController : MonoBehaviour
+public interface IPlayerController 
+{
+    void Initialize(IPlayer player);
+}
+
+public abstract class BasePlayerController : MonoBehaviour, IPlayerController
 {
     public abstract void Initialize(IPlayer player);
 }
