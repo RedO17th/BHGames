@@ -32,7 +32,6 @@ public abstract class BaseSceneSystem : MonoBehaviour, ISceneSystem
     {
         foreach (var system in _subSystems)
             system.Clear();
-
     }
 } 
 

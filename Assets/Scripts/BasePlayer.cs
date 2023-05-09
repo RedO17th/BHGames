@@ -1,47 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
-using UnityEngine.Windows;
-using Input = UnityEngine.Input;
-using System.Runtime.ConstrainedExecution;
-using UnityEngine.UIElements;
 
-public class BasePlayer : MonoBehaviour
+public interface IPlayer : IActivatable, IDeactivatable, IMovable
 {
-    [SerializeField] private float _movementSpeed = 0f;
-    [SerializeField] private float _speedRotation = 0f;
+    void Initialize();
+}
 
-    private Vector3 Direction { get; set; }
+public class BasePlayer : MonoBehaviour, IPlayer
+{
+    [Header("Controllers")]
+    [SerializeField] private BasePlayerController[] _controllers;
 
-    void Update()
+    public void SetPosition(Vector3 position) => transform.position = position;
+
+    public virtual void Initialize()
     {
-        DefineDirection();
-
-        Rotate();
-        Move();
+        InitializeControllers();
     }
 
-    private void DefineDirection()
+    private void InitializeControllers()
     {
-        Direction = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+        foreach (var controller in _controllers)
+            controller.Initialize(this);
     }
 
-    private void Rotate()
-    {
-        var inputDirection = Direction;
-        var directionRotation = new Vector3(inputDirection.x, 0f, inputDirection.z);
-        if (directionRotation.magnitude != 0f)
-        {
-            var rotation = Quaternion.LookRotation(directionRotation);
-            var targetRotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotation);
-
-            transform.rotation = targetRotation;
-        }
+    public virtual void Activate()
+    { 
+        
     }
 
-    private void Move()
+    public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
+    public virtual void Move(Vector3 position) => transform.position += position;
+
+    public virtual void Deactivate()
     {
-        transform.position += Direction * _movementSpeed * Time.deltaTime;
+
     }
 }

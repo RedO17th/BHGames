@@ -35,7 +35,9 @@ public class SpawnSubSystem : BaseSubSystem
         if (point != null)
         {
             var player = Instantiate(_playerPrefab);
-                player.transform.position = point.Position;
+                player.Initialize();    
+
+                player.SetPosition(point.Position);
         }
     }
 
