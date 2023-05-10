@@ -13,10 +13,12 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     private ICamera _camera = null;
     private IPlayer _player = null;
-    private IPlayerMovementInput _input = null;
+    private IMovementInput _input = null;
 
     private Vector3 _direction = Vector3.zero;
     private Vector3 _directionRotation = Vector3.zero;
+
+    private float _reverseDirection = 0f;
 
     public override void Initialize(IPlayerController controller)
     {
@@ -24,7 +26,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
         _player = _movementController.Player;
 
-        _input = GetComponent<IPlayerMovementInput>();
+        _input = GetComponent<IMovementInput>();
 
         _camera = _player.GetController<ICameraController>().Camera;
     }
@@ -34,12 +36,20 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     private void Update() => ProcessInputAndMove();
     private void ProcessInputAndMove()
     {
-        GetInputDirection();
+        GetInputDirectionThrowCamera();
         Rotate();
         Move();
     }
 
-    private void GetInputDirection() => _direction = _camera.YRotation * _input.Direction;
+    private void GetInputDirectionThrowCamera() => _direction = _camera.YRotation * GetInputDirection();
+
+    private Vector3 GetInputDirection()
+    {
+        _reverseDirection = _input.Forward * -1f;
+
+        return new Vector3(_input.Side, 0f, _input.Forward);
+    }
+
     private void Rotate()
     {
         _directionRotation = new Vector3(_direction.x, 0f, _direction.z);

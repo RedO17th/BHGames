@@ -2,18 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPlayerMovementInput
+public interface IMovementInput
 {
-    Vector3 Direction { get; }
+    float Forward { get; }
+    float Side { get; }
 }
 
-public class MovementInput : MonoBehaviour, IPlayerMovementInput
+public class MovementInput : MonoBehaviour, IMovementInput
 {
-    public Vector3 Direction 
-    {
-        get
-        {
-            return new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
-        }
-    }
+    public float Forward => Input.GetAxis("Vertical");
+    public float Side => Input.GetAxis("Horizontal");
 }
