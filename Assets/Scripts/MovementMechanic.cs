@@ -41,14 +41,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         Move();
     }
 
-    private void GetInputDirectionThrowCamera() => _direction = _camera.YRotation * GetInputDirection();
-
-    private Vector3 GetInputDirection()
-    {
-        _reverseDirection = _input.Forward * -1f;
-
-        return new Vector3(_input.Side, 0f, _input.Forward);
-    }
+    private void GetInputDirectionThrowCamera() => _direction = _camera.YRotation * _input.Direction;
 
     private void Rotate()
     {
@@ -63,7 +56,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     }
     private void Move()
     {
-        _player.Move(_direction * _movementSpeed * Time.deltaTime);
+        _player.Move(_direction * _movementSpeed);
     }
 
     public void Disable() => enabled = false;

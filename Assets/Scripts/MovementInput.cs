@@ -4,12 +4,16 @@ using UnityEngine;
 
 public interface IMovementInput
 {
-    float Forward { get; }
-    float Side { get; }
+    Vector3 Direction { get; }
 }
 
 public class MovementInput : MonoBehaviour, IMovementInput
 {
-    public float Forward => Input.GetAxis("Vertical");
-    public float Side => Input.GetAxis("Horizontal");
+    public Vector3 Direction
+    {
+        get
+        {
+            return new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+        }
+    }
 }
