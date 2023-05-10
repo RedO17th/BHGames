@@ -54,7 +54,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     }
     private void Move()
     {
-        _player.Move(_direction * _movementSpeed);
+        _player.Move(_direction * _movementSpeed * Time.deltaTime);
     }
 
     public void Disable() => enabled = false;

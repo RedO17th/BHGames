@@ -13,7 +13,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
 {
     [SerializeField] private BasePlayerController[] _controllers;
 
-    private Rigidbody _rigidbody = null;
+    private CharacterController _controller = null;
 
     public Vector3 Forward => transform.forward;
     public Vector3 Position
@@ -24,9 +24,9 @@ public class BasePlayer : MonoBehaviour, IPlayer
 
     public virtual void Initialize()
     {
-        _rigidbody = GetComponent<Rigidbody>();
-
         InitializeControllers();
+
+        _controller = GetComponent<CharacterController>();
     }
     private void InitializeControllers()
     {
@@ -58,8 +58,8 @@ public class BasePlayer : MonoBehaviour, IPlayer
     }
 
     public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
-    public virtual void Move(Vector3 position) { } //=> _rigidbody.velocity = position;
-    public virtual void Dash(Vector3 position) => Position = position;
+    public virtual void Move(Vector3 position) => _controller.Move(position);
+    public virtual void Dash(Vector3 position) => _controller.Move(position);
 
     public virtual void Deactivate()
     {
