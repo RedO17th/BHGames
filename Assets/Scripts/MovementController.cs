@@ -18,13 +18,7 @@ public class MovementController : BasePlayerController, IMovementController
     {
         Player = player;
 
-        DefineMechanics();
         InitializeMechanics();
-    }
-
-    private void DefineMechanics()
-    {
-        _mechanics = GetComponents<BaseMovementMechanic>();
     }
     private void InitializeMechanics()
     {

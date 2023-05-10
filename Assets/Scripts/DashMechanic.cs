@@ -1,13 +1,19 @@
 using System.Collections;
 using UnityEngine;
 
-public class DashMechanic : BaseMovementMechanic
+public interface IDashMechanic : IEnabable, IDisabable 
+{
+    float Distance { get; }
+}
+
+public class DashMechanic : BaseMovementMechanic, IDashMechanic
 {
     [SerializeField] private float _positionError = 0.05f;
     [SerializeField] private float _dashDistance = 3f;
     [SerializeField] private float _dashSpeed = 3f;
 
-    private IMovementController _movementController = null;
+    public float Distance => _dashDistance;
+
     private IMovementMechanic _movementMechanic = null;
     private IPlayerDashInput _input = null;
     private IMovable _movable = null;
@@ -19,13 +25,34 @@ public class DashMechanic : BaseMovementMechanic
 
     public override void Initialize(IPlayerController controller)
     {
-        _movementController = controller as IMovementController;
+        var movementController = controller as IMovementController;
         
-        _movable = _movementController.Player;
+        _movable = movementController.Player;
 
         _input = GetComponent<IPlayerDashInput>();
 
-        _movementMechanic = _movementController.GetMechanic<IMovementMechanic>();
+        _movementMechanic = movementController.GetMechanic<IMovementMechanic>();
+    }
+
+    public void Enable()
+    {
+        enabled = true;
+    }
+
+    public void Disable()
+    {
+        StopMechanic();
+
+        enabled = false;
+    }
+    private void StopMechanic()
+    {
+        if (_dashRoutine != null)
+            StopCoroutine(_dashRoutine);
+
+        _targetPosition = _movable.Position;
+
+        CompleteDash();
     }
 
     private void Update() => ProcessInputAndDash();

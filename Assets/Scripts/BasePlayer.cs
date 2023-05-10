@@ -58,8 +58,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
     }
 
     public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
-    public virtual void Move(Vector3 position) => _rigidbody.velocity = position;
-
+    public virtual void Move(Vector3 position) { } //=> _rigidbody.velocity = position;
     public virtual void Dash(Vector3 position) => Position = position;
 
     public virtual void Deactivate()

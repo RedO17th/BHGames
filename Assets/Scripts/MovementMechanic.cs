@@ -9,8 +9,6 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     [SerializeField] private float _movementSpeed = 0f;
     [SerializeField] private float _speedRotation = 0f;
 
-    private IMovementController _movementController = null;
-
     private ICamera _camera = null;
     private IPlayer _player = null;
     private IMovementInput _input = null;
@@ -22,9 +20,9 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     public override void Initialize(IPlayerController controller)
     {
-        _movementController = controller as IMovementController;
+        var movementController = controller as IMovementController;
 
-        _player = _movementController.Player;
+        _player = movementController.Player;
 
         _input = GetComponent<IMovementInput>();
 
