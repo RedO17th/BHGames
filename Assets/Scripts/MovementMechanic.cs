@@ -16,8 +16,6 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     private Vector3 _direction = Vector3.zero;
     private Vector3 _directionRotation = Vector3.zero;
 
-    private float _reverseDirection = 0f;
-
     public override void Initialize(IPlayerController controller)
     {
         var movementController = controller as IMovementController;

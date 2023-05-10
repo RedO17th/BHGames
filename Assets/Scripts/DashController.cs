@@ -33,29 +33,29 @@ public class DashController : BasePlayerController, IDashController
 
     private void Update() 
     {
-        if (_mechIsEnabled)
-        { 
-            _ray = new Ray(_shortRay.position, _shortRay.forward);
+        //if (_mechIsEnabled)
+        //{ 
+        //    _ray = new Ray(_shortRay.position, _shortRay.forward);
 
-            if (IsClose())
-            {
-                _mechIsEnabled = false;
+        //    if (IsClose())
+        //    {
+        //        _mechIsEnabled = false;
 
-                _dashMechanic?.Disable();
-            }            
-        }
+        //        _dashMechanic?.Disable();
+        //    }            
+        //}
 
-        if (_mechIsEnabled == false)
-        {
-            _ray = new Ray(_longRay.position, _longRay.forward);
+        //if (_mechIsEnabled == false)
+        //{
+        //    _ray = new Ray(_longRay.position, _longRay.forward);
 
-            if (IsFarEnough())
-            {
-                _mechIsEnabled = true;
+        //    if (IsFarEnough())
+        //    {
+        //        _mechIsEnabled = true;
 
-                _dashMechanic?.Enable();
-            }
-        }
+        //        _dashMechanic?.Enable();
+        //    }
+        //}
     }
 
     private bool IsClose() => Physics.Raycast(_ray, _shortRayDistance, _raysMask);

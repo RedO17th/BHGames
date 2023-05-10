@@ -22,6 +22,8 @@ public class BasePlayer : MonoBehaviour, IPlayer
         protected set => transform.position = value;
     }
 
+    private Vector3 _gravity = new Vector3(0f, -9.8f, 0f);
+
     public virtual void Initialize()
     {
         InitializeControllers();
@@ -60,6 +62,12 @@ public class BasePlayer : MonoBehaviour, IPlayer
     public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
     public virtual void Move(Vector3 position) => _controller.Move(position);
     public virtual void Dash(Vector3 position) => _controller.Move(position);
+
+    private void Update() => ProcessGravity();
+    private void ProcessGravity()
+    {
+        _controller?.Move(_gravity);
+    }
 
     public virtual void Deactivate()
     {
