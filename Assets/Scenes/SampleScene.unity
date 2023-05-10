@@ -153,8 +153,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 3.067288, z: 1}
+  m_Center: {x: 0, y: 1.033644, z: 0}
 --- !u!23 &185385455
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -309,7 +309,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &705507994
 Light:
   m_ObjectHideFlags: 0
@@ -469,8 +469,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 3.067288, z: 1}
+  m_Center: {x: 0, y: 1.033644, z: 0}
 --- !u!23 &1150810310
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -566,8 +566,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 3.067288, z: 1}
+  m_Center: {x: 0, y: 1.033644, z: 0}
 --- !u!23 &1155730362
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -663,8 +663,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 3.0672882, z: 1}
+  m_Center: {x: 0, y: 1.0336441, z: 0}
 --- !u!23 &1226219580
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1077,7 +1077,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1606848104187943760, guid: 5617a763cefda934e9dab319638d38e0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1606848104187943763, guid: 5617a763cefda934e9dab319638d38e0, type: 3}
       propertyPath: m_RootOrder

@@ -1,15 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class BaseCamera : MonoBehaviour, ICamera
 {
     public Quaternion YRotation
     {
-        get
-        { 
-            return new Quaternion(0f, _transform.rotation.y, 0f, 0f);
-        }
+        get => new Quaternion(0f, _transform.rotation.y, 0f, _transform.rotation.w);
     }
 
     private Transform _transform = null;
@@ -19,6 +17,10 @@ public class BaseCamera : MonoBehaviour, ICamera
         _transform = transform;
     }
 
+    public virtual void SetPosition(Vector3 position)
+    {
+        _transform.position = position;
+    }
     public virtual void SetRotation(Quaternion rotation)
     {
         _transform.rotation = rotation;

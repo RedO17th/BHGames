@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public interface ICameraController
 {
@@ -9,28 +10,44 @@ public interface ICameraController
 
 public class CameraController : BasePlayerController, ICameraController
 {
-    [SerializeField] private BaseCamera _camera;
     [SerializeField] private float _cameraSpeed;
+    [SerializeField] private BaseCamera _cameraPrefab;
+    [SerializeField] private Vector3 _cameraOffset;
 
-    public ICamera Camera => _playerCamera;
+    public ICamera Camera => _camera;
 
+    private IPlayer _player = null;
+
+    private ICamera _camera = null;
     private ICameraInput _input = null;
-    private ICamera _playerCamera = null;
 
     private float _xAxis = 0f;
     private float _yAxis = 0f;
 
     public override void Initialize(IPlayer player)
     {
+        _player = player;
+
         _input = GetComponent<ICameraInput>();
 
+        _camera = CreateCamera();
         _camera.Initialize();
-
-        _playerCamera = _camera;
     }
 
-    private void Update() => ProcessInputAndRotate();
-    private void ProcessInputAndRotate()
+    private BaseCamera CreateCamera() => Instantiate(_cameraPrefab);
+
+    private void Update() => ProcessCameraInteraction();
+    private void ProcessCameraInteraction()
+    {
+        Rotate();
+        Move();
+    }
+
+    private void Move()
+    {
+        _camera.SetPosition(_cameraOffset + _player.Position);
+    }
+    private void Rotate()
     {
         _xAxis += _input.MouseX * _cameraSpeed * Time.deltaTime;
         _yAxis -= _input.MouseY * _cameraSpeed * Time.deltaTime;
