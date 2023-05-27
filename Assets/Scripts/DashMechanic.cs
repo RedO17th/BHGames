@@ -1,20 +1,18 @@
 using System.Collections;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public interface IDashMechanic : IEnabable, IDisabable 
 {
-    float Distance { get; }
+
 }
 
 public class DashMechanic : BaseMovementMechanic, IDashMechanic
 {
+    [Range(1f, 5f)]
     [SerializeField] private float _dashDistance = 3f;
-    [SerializeField] private float _dashSpeed = 3f;
 
-    public float dt = 0f;
-
-    public float Distance => _dashDistance;
+    [Range(20f, 30f)]
+    [SerializeField] private float _dashSpeed = 30f;
 
     private IMovementMechanic _movementMechanic = null;
     private IPlayerDashInput _input = null;
@@ -23,7 +21,10 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     private bool _inProcess = false;
 
     private Coroutine _dashRoutine = null;
-    //private Vector3 _targetPosition = Vector3.zero;
+
+    private float _startedDashTime = 0f;
+    [Space]
+    public float _dashTime = 0f;
 
     public override void Initialize(IPlayerController controller)
     {
@@ -52,8 +53,6 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         if (_dashRoutine != null)
             StopCoroutine(_dashRoutine);
 
-        //_targetPosition = _movable.Position;
-
         CompleteDash();
     }
 
@@ -68,46 +67,39 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         }
     }
 
-    [ContextMenu("Dash")]
-    private void Test() => ProcessMechanic();
-
     private void ProcessMechanic() => _dashRoutine = StartCoroutine(Dash());
     private IEnumerator Dash()
     {
-        //PrepareToDash();
+        PrepareToDash();
 
-        _movementMechanic.Disable();
-
-        float startTime = Time.time;
-        dt = _dashDistance / _dashSpeed;
-
-        while (Time.time < startTime + dt)
+        while (CanContinue())
         {
             _movable.Dash(_movable.Forward * _dashSpeed * Time.deltaTime);
 
             yield return null;
         }
 
-        //CompleteDash();
-
-        _movementMechanic.Enable();
-
-        _inProcess = false;
+        CompleteDash();
     }
 
     private void PrepareToDash()
     {
-        //_targetPosition = _movable.Position + _movable.Forward * _dashDistance;
+        _movementMechanic.Disable();
+
+        _startedDashTime = Time.time;
+
+        _dashTime = _dashDistance / _dashSpeed;
     }
+
+    private bool CanContinue() => Time.time < (_startedDashTime + _dashTime);
 
     private void CompleteDash()
     {
-        //_movable.Dash(_targetPosition);
-
-        //_targetPosition = Vector3.zero;
-
-        _movementMechanic.Enable();
+        _startedDashTime = 0f;
+        _dashTime = 0f;
 
         _inProcess = false;
+
+        _movementMechanic.Enable();
     }
 }

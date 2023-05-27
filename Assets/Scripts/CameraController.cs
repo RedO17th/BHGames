@@ -36,7 +36,7 @@ public class CameraController : BasePlayerController, ICameraController
 
     private BaseCamera CreateCamera() => Instantiate(_cameraPrefab);
 
-    private void Update() => ProcessCameraInteraction();
+    private void LateUpdate() => ProcessCameraInteraction();
     private void ProcessCameraInteraction()
     {
         Rotate();
