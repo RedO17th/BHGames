@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IDashMechanic : IEnabable, IDisabable 
 {
-
+    bool InProcess { get; }
 }
 
 public class DashMechanic : BaseMovementMechanic, IDashMechanic
@@ -14,6 +14,10 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     [Range(20f, 30f)]
     [SerializeField] private float _dashSpeed = 30f;
 
+    public bool InProcess => _inProcess;
+
+    #region
+
     private IMovementMechanic _movementMechanic = null;
     private IPlayerDashInput _input = null;
     private IMovable _movable = null;
@@ -22,9 +26,10 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
     private Coroutine _dashRoutine = null;
 
+    private float _dashTime = 0f;
     private float _startedDashTime = 0f;
-    [Space]
-    public float _dashTime = 0f;
+
+    #endregion
 
     public override void Initialize(IPlayerController controller)
     {
@@ -37,12 +42,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         _movementMechanic = movementController.GetMechanic<IMovementMechanic>();
     }
 
-    public void Enable()
-    {
-        enabled = true;
-    }
-
-    public void Disable()
+    public override void Disable()
     {
         StopMechanic();
 

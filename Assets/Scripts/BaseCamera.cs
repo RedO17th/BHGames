@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 public class BaseCamera : MonoBehaviour, ICamera
 {
+    public Vector3 Position => _transform.position;
     public Quaternion YRotation
     {
         get => new Quaternion(0f, _transform.rotation.y, 0f, _transform.rotation.w);
@@ -14,7 +15,7 @@ public class BaseCamera : MonoBehaviour, ICamera
 
     public virtual void Initialize()
     {
-        _transform = transform;
+        _transform = GetComponent<Transform>();
     }
 
     public virtual void SetPosition(Vector3 position)

@@ -27,8 +27,6 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         _camera = _player.GetController<ICameraController>().Camera;
     }
 
-    public void Enable() => enabled = true;
-
     private void Update() => ProcessInputAndMove();
     private void ProcessInputAndMove()
     {
@@ -54,6 +52,4 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     {
         _player.Move(_direction * _movementSpeed * Time.deltaTime);
     }
-
-    public void Disable() => enabled = false;
 }

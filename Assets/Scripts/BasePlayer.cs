@@ -56,12 +56,19 @@ public class BasePlayer : MonoBehaviour, IPlayer
 
     public virtual void Activate()
     {
-
+        EnableControllers();
     }
+    private void EnableControllers()
+    {
+        foreach (var controller in _controllers)
+        {
+            controller.Enable();
+        }
+    }
+
 
     public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
     public virtual void Move(Vector3 position) => _controller.Move(position);
-    //public virtual void Dash(Vector3 position) => transform.position = position;
     public virtual void Dash(Vector3 position) => _controller.Move(position);
 
     private void Update() => ProcessGravity();
@@ -72,6 +79,13 @@ public class BasePlayer : MonoBehaviour, IPlayer
 
     public virtual void Deactivate()
     {
-
+        DisableControllers();
+    }
+    private void DisableControllers()
+    {
+        foreach (var controller in _controllers)
+        {
+            controller.Disable();
+        }
     }
 }

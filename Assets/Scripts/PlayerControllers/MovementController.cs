@@ -41,4 +41,32 @@ public class MovementController : BasePlayerController, IMovementController
 
         return result;
     }
+
+    public override void Enable()
+    {
+        base.Enable();
+
+        EnableMechanics();
+    }
+    private void EnableMechanics()
+    {
+        foreach (var mech in _mechanics)
+        {
+            mech.Enable();
+        }
+    }
+
+    public override void Disable()
+    {
+        base.Disable();
+
+        DisableMechanics();
+    }
+    private void DisableMechanics()
+    {
+        foreach (var mech in _mechanics)
+        {
+            mech.Disable();
+        }
+    }
 }

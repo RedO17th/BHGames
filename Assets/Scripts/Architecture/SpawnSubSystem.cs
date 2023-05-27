@@ -50,8 +50,9 @@ public class SpawnSubSystem : BaseSubSystem
         {
             var player = Instantiate(_playerPrefab);
                 player.Initialize();    
-
                 player.SetPosition(point.Position);
+
+                player.Activate();
         }
     }
 

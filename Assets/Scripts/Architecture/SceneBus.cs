@@ -18,3 +18,12 @@ public class CreatePlayer : BaseContext
 {
     public CreatePlayer() { }
 }
+
+public class CollisionWithEnemy : BaseContext
+{
+    public IPlayer Player { get; private set; }
+    public CollisionWithEnemy(IPlayer player)
+    {
+        Player = player;
+    }
+}
