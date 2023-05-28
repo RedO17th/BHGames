@@ -46,8 +46,17 @@ public class AnimationController : BasePlayerController
 
     public override void Disable()
     {
-        base.Disable();
-
         PlayerDataBus.OnContextEvent -= ProcessDashContext;
+
+        base.Disable();
     }
+
+    public override void Deactivate() => base.Deactivate();
+
+    protected override void Clear()
+    {
+        _movementController = null;
+        _player = null;
+    }
+
 }

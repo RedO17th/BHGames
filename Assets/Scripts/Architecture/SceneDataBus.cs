@@ -18,6 +18,14 @@ public class CreatePlayer : BaseContext
 {
     public CreatePlayer() { }
 }
+public class DashAmount : BaseContext
+{
+    public int CollisionAmount { get; private set; }  
+    public DashAmount(int amount)
+    {
+        CollisionAmount = amount;
+    }
+}
 
 
 

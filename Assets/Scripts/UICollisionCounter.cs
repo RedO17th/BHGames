@@ -34,4 +34,10 @@ public class UICollisionCounter : MonoBehaviour, IEnabable, IDisabable
             transform.LookAt(_cameraTarget.Position);
         }
     }
+
+    public void Clear()
+    {
+        _cameraTarget = null;
+        _counter = null;
+    }
 }

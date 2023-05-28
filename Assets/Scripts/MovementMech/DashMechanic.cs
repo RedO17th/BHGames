@@ -22,9 +22,9 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     private IPlayerDashInput _input = null;
     private IPlayer _player = null;
 
-    private bool _inProcess = false;
-
     private Coroutine _dashRoutine = null;
+
+    private bool _inProcess = false;
 
     private float _dashTime = 0f;
     private float _startedDashTime = 0f;
@@ -105,5 +105,19 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         _movementMechanic.Enable();
 
         PlayerDataBus.SendContext(new Dash(_player, enabled: false));
+    }
+
+    public override void Deactivate()
+    {
+        base.Deactivate();
+    }
+
+    protected override void Clear()
+    {
+        _movementMechanic = null;
+        _input = null;
+        _player = null;
+
+        _dashRoutine = null;
     }
 }

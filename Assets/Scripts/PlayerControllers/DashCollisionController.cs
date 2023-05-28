@@ -11,15 +11,26 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
     private IPlayer _player = null;
     private IDashMechanic _dashMechanic = null;
 
+    private Collider _trigger = null;
+
     public override void Initialize(IPlayer player)
     {
         _player = player;
         _dashMechanic = GetDashMechanic();
+
+        _trigger = GetComponent<Collider>();
     }
 
     private IDashMechanic GetDashMechanic()
     { 
         return _player.GetController<IMovementController>().GetMechanic<IDashMechanic>();
+    }
+
+    public override void Enable()
+    {
+        base.Enable();
+
+        _trigger.enabled = true;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,11 +41,29 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
     }
     private void ProcessCollisionThrowDash(IPlayer player)
     {
-        if (player != null && _dashMechanic.InProcess)
+        if (player != null && _dashMechanic != null)
         {
-            ProcessCollisionWithEnemyContext();
+            if (_dashMechanic.InProcess)
+            {
+                ProcessCollisionWithEnemyContext();
+            }
         }
     }
 
     private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionWithEnemy(_player));
+
+    public override void Disable()
+    {
+        _trigger.enabled = false;
+
+        base.Disable(); 
+    }
+
+    protected override void Clear()
+    {
+        _dashMechanic = null;
+        _player = null;
+
+        _trigger = null;
+    }
 }

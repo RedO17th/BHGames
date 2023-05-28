@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseMovementMechanic : MonoBehaviour, IEnabable, IDisabable
+public abstract class BaseMovementMechanic : MonoBehaviour, IEnabable, IDisabable, IDeactivatable
 {
     public abstract void Initialize(IPlayerController controller);
 
@@ -10,4 +10,7 @@ public abstract class BaseMovementMechanic : MonoBehaviour, IEnabable, IDisababl
 
     public virtual void Enable() => enabled = true;
     public virtual void Disable() => enabled = false;
+
+    public virtual void Deactivate() => Clear();
+    protected virtual void Clear() { }
 }

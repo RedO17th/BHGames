@@ -88,12 +88,20 @@ public class BasePlayer : MonoBehaviour, IPlayer
     public virtual void Deactivate()
     {
         DisableControllers();
+        DeactivateControllers();
     }
     private void DisableControllers()
     {
         foreach (var controller in _controllers)
         {
             controller.Disable();
+        }
+    }
+    private void DeactivateControllers()
+    {
+        foreach (var controller in _controllers)
+        {
+            controller.Deactivate();
         }
     }
 }

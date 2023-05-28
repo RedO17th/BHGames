@@ -12,6 +12,8 @@ public class SpawnSubSystem : BaseSubSystem
 
     private List<ISpawnPoint> _freePoints;
 
+    private List<IPlayer> _players;
+
     public override void Initialize(ISceneSystem sceneSystem)
     {
         _sceneSystem = sceneSystem as SceneSystem;
@@ -22,6 +24,8 @@ public class SpawnSubSystem : BaseSubSystem
     private void InitializeFreePoints()
     {
         _freePoints = new List<ISpawnPoint>();
+
+        _players = new List<IPlayer>();
 
         foreach (var point in _points)
         {
@@ -53,6 +57,8 @@ public class SpawnSubSystem : BaseSubSystem
                 player.SetPosition(point.Position);
 
                 player.Activate();
+
+            _players.Add(player);
         }
     }
 
@@ -68,6 +74,16 @@ public class SpawnSubSystem : BaseSubSystem
         }
 
         return result;
+    }
+
+    public override void Stop()
+    {
+        foreach (var player in _players)
+        {
+            player.Deactivate();
+        }
+
+        _players.Clear();
     }
 
     public override void Clear()

@@ -29,6 +29,8 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     private float _minSpeed = 0f;
     private float _maxSpeed = 0f;
 
+    private bool _isDeactivated = false;
+
     public override void Initialize(IPlayerController controller)
     {
         var movementController = controller as IMovementController;
@@ -46,6 +48,17 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         _camera = _player.GetController<ICameraController>().Camera;
     }
 
+    public override void Enable()
+    {
+        if (_isDeactivated == false)
+            base.Enable();
+    }
+
+    public override void Disable()
+    {
+        base.Disable();
+    }
+
     private void Update() => ProcessInputAndMove();
     private void ProcessInputAndMove()
     {
@@ -57,7 +70,13 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         Move();
     }
 
-    private void GetInputDirectionThrowCamera() => _direction = _camera.YRotation * _walkInput.Direction;
+    private void GetInputDirectionThrowCamera()
+    {
+        if (_camera != null && _walkInput != null)
+            _direction = _camera.YRotation * _walkInput.Direction;
+        else
+            _direction = Vector3.zero;
+    }
 
     private void Rotate()
     {
@@ -67,7 +86,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
             var rotation = Quaternion.LookRotation(_directionRotation);
             var targetRotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _rotationSpeed);
 
-            _player.Rotate(targetRotation);
+            _player?.Rotate(targetRotation);
         }
     }
 
@@ -90,6 +109,30 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     private void Move()
     {
-        _player.Move(_direction.normalized * _currentSpeed * Time.deltaTime);
+        _player?.Move(_direction.normalized * _currentSpeed * Time.deltaTime);
+    }
+
+    public override void Deactivate() 
+    {
+         _isDeactivated = true;
+
+        base.Deactivate();
+    }
+        
+        
+    protected override void Clear()
+    {
+        _camera = null;
+        _player = null;
+
+        _runInput = null;
+        _walkInput = null;
+
+        _direction = Vector3.zero;
+        _directionRotation = Vector3.zero;
+
+        _currentSpeed = 0f;
+        _minSpeed = 0f;
+        _maxSpeed = 0f;
     }
 }

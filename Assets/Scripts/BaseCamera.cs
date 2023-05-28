@@ -26,4 +26,9 @@ public class BaseCamera : MonoBehaviour, ICamera
     {
         _transform.rotation = rotation;
     }
+
+    public void Destroy()
+    {
+        Destroy(gameObject, 0.5f);
+    }
 }

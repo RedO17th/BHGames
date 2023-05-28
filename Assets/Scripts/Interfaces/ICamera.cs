@@ -7,4 +7,6 @@ public interface ICamera
     void Initialize();
     void SetPosition(Vector3 position);
     void SetRotation(Quaternion rotation);
+
+    void Destroy();
 }

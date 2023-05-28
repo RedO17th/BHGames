@@ -28,9 +28,11 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     {
         base.Enable();
 
+        _amountCollisions = 0;
+
         _uiCounter.Enable();
 
-        SceneDataBus.OnContextEvent += ProcessContext;
+        PlayerDataBus.OnContextEvent += ProcessContext;
     }
 
     private void ProcessContext(BaseContext context)
@@ -59,6 +61,8 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
         _amountCollisions++;
 
         _uiCounter.SetAmount(_amountCollisions);
+
+        SceneDataBus.SendContext(new DashAmount(_amountCollisions));
     }
 
     public override void Disable()
@@ -67,6 +71,22 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         _uiCounter.Disable();
 
-        SceneDataBus.OnContextEvent -= ProcessContext;
+        PlayerDataBus.OnContextEvent -= ProcessContext;
+    }
+
+    public override void Deactivate()
+    {
+        _uiCounter.SetAmount(0);
+        _uiCounter.Disable();
+        _uiCounter.Clear();
+
+        base.Deactivate();
+    }
+
+    protected override void Clear()
+    {
+        Player = null;
+
+        _amountCollisions = 0;
     }
 }

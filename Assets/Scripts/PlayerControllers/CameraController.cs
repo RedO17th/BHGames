@@ -12,7 +12,7 @@ public class CameraController : BasePlayerController, ICameraController
     [SerializeField] private float _cameraSpeed;
     [SerializeField] private BaseCamera _cameraPrefab;
     [SerializeField] private Vector3 _cameraOffset;
-
+    
     public ICamera Camera => _camera;
 
     private IPlayer _player = null;
@@ -52,5 +52,21 @@ public class CameraController : BasePlayerController, ICameraController
         _yAxis -= _input.MouseY * _cameraSpeed * Time.deltaTime;
 
         _camera.SetRotation(Quaternion.Euler(_yAxis, _xAxis, 0f));
+    }
+
+    public override void Deactivate()
+    {
+        _camera.Destroy();
+        _camera = null;
+
+        base.Deactivate();
+    }
+    protected override void Clear()
+    {
+        _player = null;
+        _input = null;
+
+        _xAxis = 0f;
+        _yAxis = 0f;
     }
 }

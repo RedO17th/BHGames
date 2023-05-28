@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -76,9 +77,9 @@ public class MovementController : BasePlayerController, IMovementController
 
     public override void Disable()
     {
-        base.Disable();
-
         DisableMechanics();
+
+        base.Disable();
     }
     private void DisableMechanics()
     {
@@ -86,5 +87,26 @@ public class MovementController : BasePlayerController, IMovementController
         {
             mech.Disable();
         }
+    }
+
+    public override void Deactivate()
+    {
+        DisableMechanics();
+        DeactivateMechanics();
+
+        base.Deactivate();
+    }
+    private void DeactivateMechanics()
+    {
+        foreach (var mech in _mechanics)
+        {
+            mech.Deactivate();
+        }
+    }
+
+    protected override void Clear()
+    {
+        _movementMechanic = null;
+        Player = null;
     }
 }
