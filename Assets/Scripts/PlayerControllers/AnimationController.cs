@@ -20,11 +20,34 @@ public class AnimationController : BasePlayerController
         _movementController = _player.GetController<IMovementController>();
     }
 
-    private void Update() => ProcessAnimations();
-    private void ProcessAnimations()
+    public override void Enable()
     {
-        Move();
+        base.Enable();
+
+        PlayerDataBus.OnContextEvent += ProcessDashContext;
     }
 
+    private void ProcessDashContext(BaseContext context)
+    {
+        if (context is Dash dContext)
+        {
+            if (dContext.Player == _player)
+            {
+                ProcessDashAnimation(dContext.Enabled);
+            }
+        }
+    }
+
+    private void ProcessDashAnimation(bool enabled) => _animator.SetBool("Dash", enabled);
+
+    private void Update() => ProcessAnimations();
+    private void ProcessAnimations() => Move();
     private void Move() => _animator.SetFloat("Speed", _movementController.Speed);
+
+    public override void Disable()
+    {
+        base.Disable();
+
+        PlayerDataBus.OnContextEvent -= ProcessDashContext;
+    }
 }

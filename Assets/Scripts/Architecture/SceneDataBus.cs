@@ -39,3 +39,14 @@ public class CollisionWithEnemy : BaseContext
         Player = player;
     }
 }
+
+public class Dash : BaseContext
+{
+    public IPlayer Player { get; private set; }
+    public bool Enabled { get; private set; }
+    public Dash(IPlayer player, bool enabled) 
+    {
+        Player = player;
+        Enabled = enabled;
+    }
+}

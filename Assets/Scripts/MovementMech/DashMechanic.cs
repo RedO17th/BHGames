@@ -16,11 +16,11 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
     public bool InProcess => _inProcess;
 
-    #region
+    #region Internal variables
 
     private IMovementMechanic _movementMechanic = null;
     private IPlayerDashInput _input = null;
-    private IMovable _movable = null;
+    private IPlayer _player = null;
 
     private bool _inProcess = false;
 
@@ -35,7 +35,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     {
         var movementController = controller as IMovementController;
         
-        _movable = movementController.Player;
+        _player = movementController.Player;
 
         _input = GetComponent<IPlayerDashInput>();
 
@@ -61,8 +61,6 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     {
         if (_input.Clicked && _inProcess == false)
         {
-            _inProcess = true;
-
             ProcessMechanic();
         }
     }
@@ -74,7 +72,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         while (CanContinue())
         {
-            _movable.Dash(_movable.Forward * _dashSpeed * Time.deltaTime);
+            _player.Dash(_player.Forward * _dashSpeed * Time.deltaTime);
 
             yield return null;
         }
@@ -84,11 +82,15 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
     private void PrepareToDash()
     {
+        _inProcess = true;
+
         _movementMechanic.Disable();
 
         _startedDashTime = Time.time;
 
         _dashTime = _dashDistance / _dashSpeed;
+
+        PlayerDataBus.SendContext(new Dash(_player, enabled: true));
     }
 
     private bool CanContinue() => Time.time < (_startedDashTime + _dashTime);
@@ -101,5 +103,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         _inProcess = false;
 
         _movementMechanic.Enable();
+
+        PlayerDataBus.SendContext(new Dash(_player, enabled: false));
     }
 }
