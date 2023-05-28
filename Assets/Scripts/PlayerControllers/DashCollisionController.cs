@@ -36,5 +36,5 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
         }
     }
 
-    private void ProcessCollisionWithEnemyContext() => SceneBus.SendContext(new CollisionWithEnemy(_player));
+    private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionWithEnemy(_player));
 }

@@ -41,7 +41,7 @@ public class SceneSystem : BaseSceneSystem
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SceneBus.SendContext(new CreatePlayer());
+            SceneDataBus.SendContext(new CreatePlayer());
         }
     }
 }

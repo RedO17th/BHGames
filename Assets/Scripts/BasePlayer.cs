@@ -27,6 +27,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
     public virtual void Initialize()
     {
         InitializeControllers();
+        PrepareControllers();
 
         _controller = GetComponent<CharacterController>();
     }
@@ -34,6 +35,13 @@ public class BasePlayer : MonoBehaviour, IPlayer
     {
         foreach (var controller in _controllers)
             controller.Initialize(this);
+    }
+    private void PrepareControllers()
+    {
+        foreach (var controller in _controllers)
+        {
+            controller.Prepare();
+        }
     }
 
     public virtual T GetController<T>() where T : class

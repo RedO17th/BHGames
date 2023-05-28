@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IMovementInput
+public interface IWalktInput
 {
     Vector3 Direction { get; }
 }
 
-public class MovementInput : MonoBehaviour, IMovementInput
+public class WalkInput : MonoBehaviour, IWalktInput
 {
     public Vector3 Direction
     {

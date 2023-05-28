@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class SceneBus
+public static class SceneDataBus
 {
     public static event Action<BaseContext> OnContextEvent;
 
@@ -17,6 +17,18 @@ public abstract class BaseContext { }
 public class CreatePlayer : BaseContext 
 {
     public CreatePlayer() { }
+}
+
+
+
+public static class PlayerDataBus
+{
+    public static event Action<BaseContext> OnContextEvent;
+
+    public static void SendContext(BaseContext context)
+    {
+        OnContextEvent?.Invoke(context);
+    }
 }
 
 public class CollisionWithEnemy : BaseContext

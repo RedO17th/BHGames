@@ -31,7 +31,7 @@ public class SpawnSubSystem : BaseSubSystem
 
     public override void Prepare()
     {
-        SceneBus.OnContextEvent += ProcessContextSignal;
+        SceneDataBus.OnContextEvent += ProcessContextSignal;
     }
 
     private void ProcessContextSignal(BaseContext context)
@@ -72,7 +72,7 @@ public class SpawnSubSystem : BaseSubSystem
 
     public override void Clear()
     {
-        SceneBus.OnContextEvent -= ProcessContextSignal;
+        SceneDataBus.OnContextEvent -= ProcessContextSignal;
 
         _sceneSystem = null;
     }

@@ -30,7 +30,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         _uiCounter.Enable();
 
-        SceneBus.OnContextEvent += ProcessContext;
+        SceneDataBus.OnContextEvent += ProcessContext;
     }
 
     private void ProcessContext(BaseContext context)
@@ -67,6 +67,6 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         _uiCounter.Disable();
 
-        SceneBus.OnContextEvent -= ProcessContext;
+        SceneDataBus.OnContextEvent -= ProcessContext;
     }
 }
