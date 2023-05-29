@@ -1,3 +1,4 @@
+using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,13 +7,15 @@ using UnityEngine.SceneManagement;
 
 public interface ISceneSystem { }
 
-public abstract class BaseSceneSystem : MonoBehaviour, ISceneSystem
+public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 {
     [SerializeField] protected BaseSubSystem[] _subSystems;
 
-    protected virtual void Awake() { }
-    protected virtual void Start() 
+    public override void Awake() => base.Awake();
+    public override void Start() 
     {
+        base.Start();
+
         InitializeSubSystems();
         PrepareSubSystems();
     }
@@ -39,10 +42,10 @@ public abstract class BaseSceneSystem : MonoBehaviour, ISceneSystem
         {
             if (dContext.CollisionAmount == 3)
             {
-                StopSystems();
+                //StopSystems();
 
                 //Заглушка
-                SceneManager.LoadScene(0);
+                //SceneManager.LoadScene(0);
             }
         }
     }
@@ -63,11 +66,11 @@ public abstract class BaseSceneSystem : MonoBehaviour, ISceneSystem
 
 public class SceneSystem : BaseSceneSystem
 {
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SceneDataBus.SendContext(new CreatePlayer());
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Space))
+    //    {
+    //        SceneDataBus.SendContext(new CreatePlayer());
+    //    }
+    //}
 }
