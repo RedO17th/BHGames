@@ -29,7 +29,7 @@ public class AnimationController : BasePlayerController
 
     private void ProcessDashContext(BaseContext context)
     {
-        if (context is Dash dContext)
+        if (context is DashContext dContext)
         {
             if (dContext.Player == _player)
             {

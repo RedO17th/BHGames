@@ -46,7 +46,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     {
         bool result = false;
 
-        if (context is CollisionWithEnemy ceContext)
+        if (context is CollisionContext ceContext)
         {
             if (ceContext.Player == Player)
             {

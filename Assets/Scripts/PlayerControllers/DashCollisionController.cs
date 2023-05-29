@@ -31,29 +31,48 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
         base.Enable();
 
         _trigger.enabled = true;
+
+        PlayerDataBus.OnContextEvent += ProcessContext;
     }
 
+    private void ProcessContext(BaseContext context)
+    {
+        if (context is DamageContext dContext)
+        {
+            if (dContext.Player == _player)
+            {
+                ProcessDamageContext(dContext.Begin);
+            }
+        }
+    }
+    private void ProcessDamageContext(bool state) => _trigger.enabled = !state;
+
+    #region Trigger
     private void OnTriggerEnter(Collider other)
     {
         var player = other?.attachedRigidbody?.GetComponent<IPlayer>();
 
         ProcessCollisionThrowDash(player);
     }
-    private void ProcessCollisionThrowDash(IPlayer player)
+    private void ProcessCollisionThrowDash(IPlayer enemy)
     {
-        if (player != null && _dashMechanic != null)
+        if (enemy != null && _dashMechanic != null)
         {
-            if (_dashMechanic.InProcess)
+            if (enemy.CanDamaged && _dashMechanic.InProcess)
             {
+                enemy.Damage();
+
                 ProcessCollisionWithEnemyContext();
             }
         }
     }
-
-    private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionWithEnemy(_player));
+    private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionContext(_player));
+    #endregion
 
     public override void Disable()
     {
+        PlayerDataBus.OnContextEvent -= ProcessContext;
+
         _trigger.enabled = false;
 
         base.Disable(); 

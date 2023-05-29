@@ -90,7 +90,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         _dashTime = _dashDistance / _dashSpeed;
 
-        PlayerDataBus.SendContext(new Dash(_player, enabled: true));
+        PlayerDataBus.SendContext(new DashContext(_player, enabled: true));
     }
 
     private bool CanContinue() => Time.time < (_startedDashTime + _dashTime);
@@ -104,7 +104,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         _movementMechanic.Enable();
 
-        PlayerDataBus.SendContext(new Dash(_player, enabled: false));
+        PlayerDataBus.SendContext(new DashContext(_player, enabled: false));
     }
 
     public override void Deactivate()

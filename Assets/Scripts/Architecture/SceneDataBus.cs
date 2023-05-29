@@ -39,22 +39,37 @@ public static class PlayerDataBus
     }
 }
 
-public class CollisionWithEnemy : BaseContext
+//BasePlayerContext ???
+public class CollisionContext : BaseContext
 {
     public IPlayer Player { get; private set; }
-    public CollisionWithEnemy(IPlayer player)
+    public CollisionContext(IPlayer player)
     {
         Player = player;
     }
 }
 
-public class Dash : BaseContext
+//BasePlayerContext ???
+public class DashContext : BaseContext
 {
     public IPlayer Player { get; private set; }
     public bool Enabled { get; private set; }
-    public Dash(IPlayer player, bool enabled) 
+    public DashContext(IPlayer player, bool enabled) 
     {
         Player = player;
         Enabled = enabled;
+    }
+}
+
+//BasePlayerContext ???
+public class DamageContext : BaseContext
+{
+    public IPlayer Player { get; private set; }
+    public bool Begin { get; private set; }
+
+    public DamageContext(IPlayer player, bool begin)
+    {
+        Player = player;
+        Begin = begin;
     }
 }

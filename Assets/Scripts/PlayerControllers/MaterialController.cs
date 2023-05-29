@@ -1,43 +1,68 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class MaterialController : BasePlayerController
 {
     [SerializeField] private SkinnedMeshRenderer _renderer;
     [SerializeField] private Material _material;
 
-    private Material _sourceMaterial = null;
+    private IPlayer _player = null;
 
-    private bool _check = false;
+    private Material _sourceMaterial = null;
 
     public override void Initialize(IPlayer player)
     {
+        _player = player;
         _sourceMaterial = _renderer.material;
     }
 
     public override void Prepare() { }
 
-    //public virtual void Enable() => enabled = true;
-    //public virtual void Disable() => enabled = false;
-
-    private void Update()
+    public override void Enable()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        base.Enable();
+
+        PlayerDataBus.OnContextEvent += ProcessContext;
+    }
+
+    private void ProcessContext(BaseContext context)
+    {
+        if (context is DamageContext dContext)
         {
-            if (_check == false)
+            if (dContext.Player == _player)
             {
-                _check = true;
-                _renderer.material = _material;
-            }
-            else
-            {
-                _check = false;
-                _renderer.material = _sourceMaterial;
+                ProcessDamageContext(switchMaterial: dContext.Begin);
             }
         }
     }
 
-    //public virtual void Deactivate() => Clear();
-    protected override void Clear() { }
+    private void ProcessDamageContext(bool switchMaterial)
+    {
+        var material = (switchMaterial) ? _material : _sourceMaterial;
+
+        SetMaterial(material);
+    }
+
+    private void SetMaterial(Material material) => _renderer.material = material;
+
+    public override void Disable()
+    {
+        PlayerDataBus.OnContextEvent -= ProcessContext;
+
+        base.Disable();
+    }    
+
+    public override void Deactivate()
+    {
+        SetMaterial(_sourceMaterial);
+
+        base.Deactivate();
+    }
+    protected override void Clear()
+    {
+        _sourceMaterial = null;
+        _player = null;
+    }
 }
