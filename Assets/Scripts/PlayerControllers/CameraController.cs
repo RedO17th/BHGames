@@ -9,15 +9,14 @@ public interface ICameraController
 
 public class CameraController : BasePlayerController, ICameraController
 {
+    [SerializeField] private BaseCamera _camera;
+
     [SerializeField] private float _cameraSpeed;
-    [SerializeField] private BaseCamera _cameraPrefab;
     [SerializeField] private Vector3 _cameraOffset;
     
     public ICamera Camera => _camera;
 
     private IPlayer _player = null;
-
-    private ICamera _camera = null;
     private ICameraInput _input = null;
 
     private float _xAxis = 0f;
@@ -29,11 +28,8 @@ public class CameraController : BasePlayerController, ICameraController
 
         _input = GetComponent<ICameraInput>();
 
-        _camera = CreateCamera();
         _camera.Initialize();
     }
-
-    private BaseCamera CreateCamera() => Instantiate(_cameraPrefab);
 
     private void LateUpdate() => ProcessCameraInteraction();
     private void ProcessCameraInteraction()

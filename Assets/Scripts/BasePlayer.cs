@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using Mirror;
+using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public interface IDamagable
 {
@@ -13,9 +12,11 @@ public interface IPlayer : IActivatable, IDeactivatable, IMovable, IDamagable
 {
     void Initialize();
     T GetController<T>() where T : class;
+
+    void SetPosition(Vector3 position);
 }
 
-public class BasePlayer : MonoBehaviour, IPlayer
+public class BasePlayer : NetworkBehaviour, IPlayer
 {
     [SerializeField] private BasePlayerController[] _controllers;
 
@@ -35,8 +36,14 @@ public class BasePlayer : MonoBehaviour, IPlayer
 
     private Vector3 _gravity = new Vector3(0f, -9.8f, 0f);
 
+    public void SetPosition(Vector3 position) => Position = position;
+
     #region Initialization
-    public virtual void Initialize()
+    public virtual void Initialize() => RpcInitialize();
+
+    [ClientRpc]
+    private void RpcInitialize() => BaseInitialize();
+    private void BaseInitialize()
     {
         InitializeControllers();
         PrepareControllers();
@@ -45,6 +52,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
 
         _damageController = GetController<IDamageController>();
     }
+
     private void InitializeControllers()
     {
         foreach (var controller in _controllers)
@@ -74,12 +82,12 @@ public class BasePlayer : MonoBehaviour, IPlayer
     }
     #endregion
 
-    public void SetPosition(Vector3 position) => Position = position;
+    #region Activate
+    public virtual void Activate() => RpcActivate();
 
-    public virtual void Activate()
-    {
-        EnableControllers();
-    }
+    [ClientRpc]
+    private void RpcActivate() => BaseActivate();
+    private void BaseActivate() => EnableControllers();
     private void EnableControllers()
     {
         foreach (var controller in _controllers)
@@ -87,6 +95,7 @@ public class BasePlayer : MonoBehaviour, IPlayer
             controller.Enable();
         }
     }
+    #endregion
 
     #region Moving
     public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
@@ -94,15 +103,21 @@ public class BasePlayer : MonoBehaviour, IPlayer
     public virtual void Dash(Vector3 position) => _controller.Move(position);
     #endregion
 
+    [Client]
     private void Update() => ProcessGravity();
     private void ProcessGravity()
     {
         _controller?.Move(_gravity);
     }
 
+    #region Deactivate
     public void Damage() => _damageController.Damage();
 
-    public virtual void Deactivate()
+    public virtual void Deactivate() => RpcDeactivate();
+
+    [ClientRpc]
+    private void RpcDeactivate() => BaseDeactivate();
+    private void BaseDeactivate()
     {
         DisableControllers();
         DeactivateControllers();
@@ -124,6 +139,5 @@ public class BasePlayer : MonoBehaviour, IPlayer
             controller.Deactivate();
         }
     }
-
-
+    #endregion
 }

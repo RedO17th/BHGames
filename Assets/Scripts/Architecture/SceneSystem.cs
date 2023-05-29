@@ -11,13 +11,12 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 {
     [SerializeField] protected BaseSubSystem[] _subSystems;
 
-    public override void Awake() => base.Awake();
-    public override void Start() 
+    public override void OnStartServer()
     {
-        base.Start();
-
         InitializeSubSystems();
         PrepareSubSystems();
+
+        Debug.Log($"BaseSceneSystem.OnStartServer");
     }
 
     protected virtual void InitializeSubSystems()
@@ -31,6 +30,7 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
             system.Prepare();
     }
 
+    //Проверить, где это нужно
     protected virtual void OnEnable()
     {
         SceneDataBus.OnContextEvent += ProcessContext;
@@ -66,11 +66,17 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 
 public class SceneSystem : BaseSceneSystem
 {
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.Space))
-    //    {
-    //        SceneDataBus.SendContext(new CreatePlayer());
-    //    }
-    //}
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+    {
+        base.OnServerAddPlayer(conn);
+
+        var player = conn?.identity?.gameObject.GetComponent<IPlayer>();
+
+        if (player != null)
+        {
+            Debug.Log($"SceneSystem.OnServerConnect");
+
+            SceneDataBus.SendContext(new AddPlayer(player));
+        }
+    }
 }

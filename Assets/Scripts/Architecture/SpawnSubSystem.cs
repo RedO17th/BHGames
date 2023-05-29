@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public class SpawnSubSystem : BaseSubSystem
 {
@@ -38,21 +39,21 @@ public class SpawnSubSystem : BaseSubSystem
         SceneDataBus.OnContextEvent += ProcessContextSignal;
     }
 
+    [Server]
     private void ProcessContextSignal(BaseContext context)
     {
-        if (context is CreatePlayer cContext)
+        if (context is AddPlayer cContext)
         {
-            CreatePlayer();
+            ProcessAddPlayerContext(cContext.Player);
         }
     }
 
-    private void CreatePlayer()
+    private void ProcessAddPlayerContext(IPlayer player)
     {
         var point = GetSpawnPoint();
 
         if (point != null)
         {
-            var player = Instantiate(_playerPrefab);
                 player.Initialize();    
                 player.SetPosition(point.Position);
 

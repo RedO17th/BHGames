@@ -14,9 +14,13 @@ public static class SceneDataBus
 }
 
 public abstract class BaseContext { }
-public class CreatePlayer : BaseContext 
+public class AddPlayer : BaseContext 
 {
-    public CreatePlayer() { }
+    public IPlayer Player { get; private set; }
+    public AddPlayer(IPlayer player)
+    {
+        Player = player;
+    }
 }
 public class DashAmount : BaseContext
 {
