@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public interface IDashCollisionController { }
 
@@ -47,6 +48,7 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
     private void ProcessDamageContext(bool state) => _trigger.enabled = !state;
 
     #region Trigger
+    [Client]
     private void OnTriggerEnter(Collider other)
     {
         var player = other?.attachedRigidbody?.GetComponent<IPlayer>();
@@ -57,12 +59,14 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
     {
         if (enemy != null && _dashMechanic != null)
         {
-            if (enemy.CanDamaged && _dashMechanic.InProcess)
-            {
-                enemy.Damage();
+            //if (enemy.CanDamaged && _dashMechanic.InProcess)
+            //{
+            //    //enemy.Damage();
 
-                ProcessCollisionWithEnemyContext();
-            }
+            //    //ProcessCollisionWithEnemyContext();
+            //}
+
+            Debug.Log($"DashCollisionController.ProcessCollisionThrowDash");
         }
     }
     private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionContext(_player));

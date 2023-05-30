@@ -37,33 +37,34 @@ public class AnimationController : BasePlayerController
         }
     }
 
-    private void ProcessDashAnimation(bool enabled) => BaseDash(enabled);
+    private void ProcessDashAnimation(bool enabled)
+    {
+        BaseDash(enabled);
+
+        CmdDash(enabled);
+    }
+
     private void BaseDash(bool enabled) => _animator.SetBool("Dash", enabled);
+
+    [Command]
+    private void CmdDash(bool enabled) => BaseDash(enabled);
 
     #region Move
 
-    //[Client]
+    [Client]
     private void Update() => ProcessAnimations();
     private void ProcessAnimations() => Move();
     private void Move()
     {
-        Debug.Log($"AnimationController.Move: speed = {_movementController.Speed} ");
-
         BaseMove(_movementController.Speed);
 
-        //CmdMove(_movementController.Speed);
+        CmdMove(_movementController.Speed);
     }
 
     private void BaseMove(float speed) => _animator.SetFloat("Speed", speed);
 
-    //[Command(requiresAuthority = false)]
-    //private void CmdMove(float speed)
-    //{
-    //    Debug.Log($"AnimationController.CmdMove: speed = { speed } ");
-
-    //    //BaseMove(speed);
-    //    _animator.SetFloat("Speed", speed);
-    //}
+    [Command]
+    private void CmdMove(float speed) => BaseMove(speed);
     #endregion
 
     public override void Disable()

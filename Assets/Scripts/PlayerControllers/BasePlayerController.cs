@@ -6,7 +6,7 @@ public interface IPlayerController
     void Initialize(IPlayer player);
 }
 
-public abstract class BasePlayerController : MonoBehaviour, IPlayerController, IEnabable, IDisabable, IDeactivatable
+public abstract class BasePlayerController : NetworkBehaviour, IPlayerController, IEnabable, IDisabable, IDeactivatable
 {
     public abstract void Initialize(IPlayer player);
     public virtual void Prepare() { }

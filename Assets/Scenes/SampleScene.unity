@@ -1124,7 +1124,7 @@ MonoBehaviour:
   runInBackground: 1
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
-  sendRate: 10
+  sendRate: 1
   offlineScene: 
   onlineScene: 
   transport: {fileID: 1764608563}
