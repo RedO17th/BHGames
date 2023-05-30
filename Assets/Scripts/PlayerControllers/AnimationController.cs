@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
+using System;
 
 public class AnimationController : BasePlayerController
 {
@@ -38,11 +37,34 @@ public class AnimationController : BasePlayerController
         }
     }
 
-    private void ProcessDashAnimation(bool enabled) => _animator.SetBool("Dash", enabled);
+    private void ProcessDashAnimation(bool enabled) => BaseDash(enabled);
+    private void BaseDash(bool enabled) => _animator.SetBool("Dash", enabled);
 
+    #region Move
+
+    //[Client]
     private void Update() => ProcessAnimations();
     private void ProcessAnimations() => Move();
-    private void Move() => _animator.SetFloat("Speed", _movementController.Speed);
+    private void Move()
+    {
+        Debug.Log($"AnimationController.Move: speed = {_movementController.Speed} ");
+
+        BaseMove(_movementController.Speed);
+
+        //CmdMove(_movementController.Speed);
+    }
+
+    private void BaseMove(float speed) => _animator.SetFloat("Speed", speed);
+
+    //[Command(requiresAuthority = false)]
+    //private void CmdMove(float speed)
+    //{
+    //    Debug.Log($"AnimationController.CmdMove: speed = { speed } ");
+
+    //    //BaseMove(speed);
+    //    _animator.SetFloat("Speed", speed);
+    //}
+    #endregion
 
     public override void Disable()
     {

@@ -39,7 +39,7 @@ public class SpawnSubSystem : BaseSubSystem
         SceneDataBus.OnContextEvent += ProcessContextSignal;
     }
 
-    [Server]
+    //[Server]
     private void ProcessContextSignal(BaseContext context)
     {
         if (context is AddPlayer cContext)

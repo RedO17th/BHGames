@@ -1,6 +1,7 @@
 using Mirror;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public interface IDamagable
 {
@@ -39,7 +40,12 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     public void SetPosition(Vector3 position) => Position = position;
 
     #region Initialization
-    public virtual void Initialize() => RpcInitialize();
+    public virtual void Initialize()
+    {
+        _controller = GetComponent<CharacterController>();
+
+        RpcInitialize();
+    }
 
     [ClientRpc]
     private void RpcInitialize() => BaseInitialize();
@@ -98,9 +104,36 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     #endregion
 
     #region Moving
-    public virtual void Rotate(Quaternion rotation) => transform.rotation = rotation;
-    public virtual void Move(Vector3 position) => _controller.Move(position);
-    public virtual void Dash(Vector3 position) => _controller.Move(position);
+    public virtual void Rotate(Quaternion rotation)
+    {
+        BaseRotation(rotation);
+
+        CmdRotation(rotation);
+    }
+    private void BaseRotation(Quaternion rotation) => transform.rotation = rotation;
+
+    public virtual void Move(Vector3 position)
+    {
+        CmdMove(position);
+
+        _controller.Move(position);
+    }
+    public virtual void Dash(Vector3 position)
+    {
+        CmdDash(position);
+
+        _controller.Move(position);
+    }
+
+    [Command]
+    private void CmdMove(Vector3 position) => _controller.Move(position);
+
+    [Command]
+    private void CmdDash(Vector3 position) => _controller.Move(position);
+
+    [Command]
+    private void CmdRotation(Quaternion rotation) => BaseRotation(rotation);
+
     #endregion
 
     [Client]
@@ -113,7 +146,12 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     #region Deactivate
     public void Damage() => _damageController.Damage();
 
-    public virtual void Deactivate() => RpcDeactivate();
+    public virtual void Deactivate()
+    {
+        _controller = null;
+
+        RpcDeactivate();
+    }
 
     [ClientRpc]
     private void RpcDeactivate() => BaseDeactivate();

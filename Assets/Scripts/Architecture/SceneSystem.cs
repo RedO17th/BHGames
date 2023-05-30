@@ -2,6 +2,7 @@ using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -38,16 +39,16 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 
     private void ProcessContext(BaseContext context)
     {
-        if (context is DashAmount dContext)
-        {
-            if (dContext.CollisionAmount == 3)
-            {
-                //StopSystems();
+        //if (context is DashAmount dContext)
+        //{
+        //    if (dContext.CollisionAmount == 3)
+        //    {
+        //        //StopSystems();
 
-                //Заглушка
-                //SceneManager.LoadScene(0);
-            }
-        }
+        //        //Заглушка
+        //        //SceneManager.LoadScene(0);
+        //    }
+        //}
     }
 
     private void StopSystems()
@@ -76,7 +77,12 @@ public class SceneSystem : BaseSceneSystem
         {
             Debug.Log($"SceneSystem.OnServerConnect");
 
-            SceneDataBus.SendContext(new AddPlayer(player));
+            //SceneDataBus.SendContext(new AddPlayer(player));
+
+            player.Initialize();
+            //player.SetPosition(point.Position);
+
+            player.Activate();
         }
     }
 }

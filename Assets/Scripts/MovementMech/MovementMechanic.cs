@@ -1,3 +1,4 @@
+using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -59,6 +60,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         base.Disable();
     }
 
+    [Client]
     private void Update() => ProcessInputAndMove();
     private void ProcessInputAndMove()
     {
