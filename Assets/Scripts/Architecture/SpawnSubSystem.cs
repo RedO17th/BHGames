@@ -57,7 +57,7 @@ public class SpawnSubSystem : BaseSubSystem
                 player.Initialize();    
                 player.SetPosition(point.Position);
 
-                player.Activate();
+                //player.Activate();
 
             _players.Add(player);
         }

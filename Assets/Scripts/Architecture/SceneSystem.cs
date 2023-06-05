@@ -32,28 +32,31 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
     }
 
     //Проверить, где это нужно
-    protected virtual void OnEnable()
-    {
-        SceneDataBus.OnContextEvent += ProcessContext;
-    }
+    //protected virtual void OnEnable()
+    //{
+    //    SceneDataBus.OnContextEvent += ProcessContext;
+    //}
 
-    private void ProcessContext(BaseContext context)
-    {
-        //if (context is DashAmount dContext)
-        //{
-        //    if (dContext.CollisionAmount == 3)
-        //    {
-        //        //StopSystems();
+    //private void ProcessContext(BaseContext context)
+    //{
+    //    if (context is DashAmount dContext)
+    //    {
+    //        if (dContext.CollisionAmount == 3)
+    //        {
+    //            //StopSystems();
 
-        //        //Заглушка
-        //        //SceneManager.LoadScene(0);
-        //    }
-        //}
-    }
+    //            //Заглушка
+    //            //SceneManager.LoadScene(0);
+    //        }
+    //    }
+    //}
+
+    [ServerCallback]
+    protected virtual void OnDisable() => StopSystems();
 
     private void StopSystems()
     {
-        SceneDataBus.OnContextEvent -= ProcessContext;
+        //SceneDataBus.OnContextEvent -= ProcessContext;
 
         foreach (var system in _subSystems)
             system.Stop();
@@ -61,12 +64,17 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
         foreach (var system in _subSystems)
             system.Clear();
     }
-
-    protected virtual void OnDisable() => StopSystems();
 } 
 
 public class SceneSystem : BaseSceneSystem
 {
+    public override void OnServerConnect(NetworkConnectionToClient conn)
+    {
+        base.OnServerConnect(conn);
+
+        Debug.Log($"SceneSystem.OnServerConnect");
+    }
+
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
@@ -75,14 +83,15 @@ public class SceneSystem : BaseSceneSystem
 
         if (player != null)
         {
-            Debug.Log($"SceneSystem.OnServerConnect");
+            Debug.Log($"SceneSystem.OnServerAddPlayer");
 
             //SceneDataBus.SendContext(new AddPlayer(player));
 
             player.Initialize();
+            player.Enable();
+            
             //player.SetPosition(point.Position);
 
-            player.Activate();
         }
     }
 }

@@ -1,3 +1,5 @@
+using Mirror;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,22 +28,67 @@ public class CameraController : BasePlayerController, ICameraController
     {
         _player = player;
 
-        _input = GetComponent<ICameraInput>();
-
-        _camera.Initialize();
+        RpcInitialize();
     }
 
-    private void LateUpdate() => ProcessCameraInteraction();
-    private void ProcessCameraInteraction()
+    [ClientRpc]
+    private void RpcInitialize()
     {
-        Rotate();
-        Move();
+        if (isLocalPlayer)
+        { 
+            _input = GetComponent<ICameraInput>();
+
+            _camera.Initialize();
+
+            Debug.Log($"CameraController.RpcInitialize");            
+        }    
     }
 
-    private void Move()
+    [Server]
+    public override void Enable() => RpcEnable();
+
+    [ClientRpc]
+    private void RpcEnable()
     {
-        _camera.SetPosition(_cameraOffset + _player.Position);
+        if (isLocalPlayer)
+        {
+            enabled = true;
+
+            _camera.gameObject.SetActive(true);
+
+            Debug.Log($"CameraController.RpcEnable I");
+        }
     }
+
+    [Server]
+    public override void Disable() => RpcDisable();
+
+    [Client]
+    private void RpcDisable()
+    {
+        if (isLocalPlayer)
+        {
+            enabled = false;
+
+            _camera.gameObject.SetActive(false);
+
+            Debug.Log($"CameraController.RpcDisable I");
+        }
+    }
+
+
+    [ClientCallback]
+    private void LateUpdate() => ProcessLocalCameraInteraction();
+    private void ProcessLocalCameraInteraction()
+    {
+        if (isLocalPlayer)
+        { 
+            Rotate();
+            CmdMove();            
+        }
+    }
+
+    [Client]
     private void Rotate()
     {
         _xAxis += _input.MouseX * _cameraSpeed * Time.deltaTime;
@@ -50,6 +97,19 @@ public class CameraController : BasePlayerController, ICameraController
         _camera.SetRotation(Quaternion.Euler(_yAxis, _xAxis, 0f));
     }
 
+    [Command]
+    private void CmdMove() => RpcMove(_cameraOffset + _player.Position);
+
+    [ClientRpc]
+    private void RpcMove(Vector3 targetPosition)
+    {
+        if (isLocalPlayer)
+        {
+            _camera.SetPosition(targetPosition);
+        }
+    }
+
+    //..
     public override void Deactivate()
     {
         _camera.Destroy();

@@ -1,5 +1,6 @@
 using Mirror;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public interface IDamagable
 {
@@ -7,7 +8,7 @@ public interface IDamagable
     void Damage();
 }
 
-public interface IPlayer : IActivatable, IDeactivatable, IMovable, IDamagable
+public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDamagable
 {
     void Initialize();
     T GetController<T>() where T : class;
@@ -17,6 +18,8 @@ public interface IPlayer : IActivatable, IDeactivatable, IMovable, IDamagable
 
 public class BasePlayer : NetworkBehaviour, IPlayer
 {
+    [SerializeField] private CharacterController _controller = null;
+
     [SerializeField] private BasePlayerController[] _controllers;
 
 
@@ -31,44 +34,11 @@ public class BasePlayer : NetworkBehaviour, IPlayer
 
     private IDamageController _damageController = null;
 
-    private CharacterController _controller = null;
-
     private Vector3 _gravity = new Vector3(0f, -9.8f, 0f);
 
     public void SetPosition(Vector3 position) => Position = position;
 
-    #region Initialization
-    public virtual void Initialize()
-    {
-        _controller = GetComponent<CharacterController>();
-
-        RpcInitialize();
-    }
-
-    [ClientRpc]
-    private void RpcInitialize() => BaseInitialize();
-    private void BaseInitialize()
-    {
-        InitializeControllers();
-        PrepareControllers();
-
-        _controller = GetComponent<CharacterController>();
-
-        _damageController = GetController<IDamageController>();
-    }
-
-    private void InitializeControllers()
-    {
-        foreach (var controller in _controllers)
-            controller.Initialize(this);
-    }
-    private void PrepareControllers()
-    {
-        foreach (var controller in _controllers)
-        {
-            controller.Prepare();
-        }
-    }
+    #region Systemic
     public virtual T GetController<T>() where T : class
     {
         T result = null;
@@ -86,12 +56,31 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     }
     #endregion
 
-    #region Activate
-    public virtual void Activate() => RpcActivate();
+    #region Initialization
+    public virtual void Initialize()
+    {
+        InitializeControllers();
+        PrepareControllers();
 
-    [ClientRpc]
-    private void RpcActivate() => BaseActivate();
-    private void BaseActivate() => EnableControllers();
+        _damageController = GetController<IDamageController>();
+    }
+
+    private void InitializeControllers()
+    {
+        foreach (var controller in _controllers)
+            controller.Initialize(this);
+    }
+    private void PrepareControllers()
+    {
+        foreach (var controller in _controllers)
+        {
+            controller.Prepare();
+        }
+    }
+    #endregion
+
+    #region Enable
+    public void Enable() => EnableControllers();
     private void EnableControllers()
     {
         foreach (var controller in _controllers)
@@ -102,65 +91,45 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     #endregion
 
     #region Moving
+
+    [Server]
     public virtual void Rotate(Quaternion rotation)
     {
-        BaseRotation(rotation);
-
-        CmdRotation(rotation);
-    }
-    private void BaseRotation(Quaternion rotation) => transform.rotation = rotation;
-
-    public virtual void Move(Vector3 position)
-    {
-        CmdMove(position);
-
-        _controller.Move(position);
-    }
-    public virtual void Dash(Vector3 position)
-    {
-        CmdDash(position);
-
-        _controller.Move(position);
+        BaseRotate(rotation);
+        RpcRotate(rotation);
     }
 
-    [Command]
-    private void CmdMove(Vector3 position) => _controller.Move(position);
-
-    [Command]
-    private void CmdDash(Vector3 position) => _controller.Move(position);
-
-    [Command]
-    private void CmdRotation(Quaternion rotation) => BaseRotation(rotation);
-
-    #endregion
-
-    [Client]
-    private void Update() => ProcessGravity();
-    private void ProcessGravity()
-    {
-        _controller?.Move(_gravity);
-    }
-
-    #region Deactivate
-    public void Damage() => _damageController.Damage();
-
-    public virtual void Deactivate()
-    {
-        _controller = null;
-
-        RpcDeactivate();
-    }
+    private void BaseRotate(Quaternion rotation) => transform.rotation = rotation;
 
     [ClientRpc]
-    private void RpcDeactivate() => BaseDeactivate();
-    private void BaseDeactivate()
-    {
-        DisableControllers();
-        DeactivateControllers();
+    private void RpcRotate(Quaternion rotation) => BaseRotate(rotation);
 
-        _damageController = null;
-        _controller = null;
+    [Server]
+    public virtual void Move(Vector3 position)
+    {
+        BaseMove(position);
+        RpcMove(position);
     }
+
+    private void BaseMove(Vector3 position) => _controller.Move(position);
+
+    [ClientRpc]
+    private void RpcMove(Vector3 position) => BaseMove(position);
+    
+    //..
+    public virtual void Dash(Vector3 position) => _controller.Move(position);
+    #endregion
+
+    [ServerCallback]
+    private void Update() => ProcessGravity();
+    private void ProcessGravity() => _controller.Move(_gravity);
+
+    #region Damage
+    public void Damage() => _damageController.Damage();
+    #endregion
+
+    #region Disable
+    public void Disable() => DisableControllers();
     private void DisableControllers()
     {
         foreach (var controller in _controllers)
@@ -168,6 +137,17 @@ public class BasePlayer : NetworkBehaviour, IPlayer
             controller.Disable();
         }
     }
+    #endregion
+
+    public virtual void Deactivate()
+    {
+        DisableControllers();
+        DeactivateControllers();
+
+        _damageController = null;
+        _controller = null;
+    }
+
     private void DeactivateControllers()
     {
         foreach (var controller in _controllers)
@@ -175,5 +155,4 @@ public class BasePlayer : NetworkBehaviour, IPlayer
             controller.Deactivate();
         }
     }
-    #endregion
 }

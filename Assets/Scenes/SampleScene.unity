@@ -1124,18 +1124,17 @@ MonoBehaviour:
   runInBackground: 1
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
-  sendRate: 1
+  sendRate: 30
   offlineScene: 
   onlineScene: 
   transport: {fileID: 1764608563}
   networkAddress: localhost
-  maxConnections: 100
+  maxConnections: 4
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 1606848104187943760, guid: 5617a763cefda934e9dab319638d38e0, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs:
-  - {fileID: 0}
+  spawnPrefabs: []
   timeInterpolationGui: 0
   _subSystems:
   - {fileID: 1089308127}

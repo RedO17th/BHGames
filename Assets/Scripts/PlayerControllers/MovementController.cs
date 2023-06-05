@@ -19,32 +19,7 @@ public class MovementController : BasePlayerController, IMovementController
 
     private IMovementMechanic _movementMechanic = null;
 
-    public override void Initialize(IPlayer player)
-    {
-        Player = player;
-
-        InitializeMechanics();
-
-        _movementMechanic = GetMechanic<IMovementMechanic>();
-    }
-    private void InitializeMechanics()
-    {
-        foreach (var mechanic in _mechanics)
-            mechanic.Initialize(this);
-    }
-
-    public override void Prepare() 
-    {
-        PrepareMchanics();
-    }
-    private void PrepareMchanics()
-    {
-        foreach (var mech in _mechanics)
-        {
-            mech.Prepare();
-        }
-    }
-
+    #region Systemic
     public virtual T GetMechanic<T>() where T : class
     {
         T result = null;
@@ -59,6 +34,30 @@ public class MovementController : BasePlayerController, IMovementController
         }
 
         return result;
+    }
+    #endregion
+
+    public override void Initialize(IPlayer player)
+    {
+        Player = player;
+
+        InitializeMechanics();
+
+        _movementMechanic = GetMechanic<IMovementMechanic>();
+    }
+    private void InitializeMechanics()
+    {
+        foreach (var mechanic in _mechanics)
+            mechanic.Initialize(this);
+    }
+
+    public override void Prepare() => PrepareMchanics();
+    private void PrepareMchanics()
+    {
+        foreach (var mech in _mechanics)
+        {
+            mech.Prepare();
+        }
     }
 
     public override void Enable()

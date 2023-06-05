@@ -1,8 +1,9 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseMovementMechanic : MonoBehaviour, IEnabable, IDisabable, IDeactivatable
+public abstract class BaseMovementMechanic : NetworkBehaviour, IEnabable, IDisabable, IDeactivatable
 {
     public abstract void Initialize(IPlayerController controller);
 
