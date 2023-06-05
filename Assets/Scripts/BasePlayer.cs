@@ -59,18 +59,26 @@ public class BasePlayer : NetworkBehaviour, IPlayer
     #region Initialization
     public virtual void Initialize()
     {
-        InitializeControllers();
-        PrepareControllers();
+        RpcInitializeControllers();
+        BaseInitializeControllers();
+
+        RpcPrepareControllers();
+        BasePrepareControllers();
 
         _damageController = GetController<IDamageController>();
     }
 
-    private void InitializeControllers()
+    [ClientRpc]
+    private void RpcInitializeControllers() => BaseInitializeControllers();
+    private void BaseInitializeControllers()
     {
         foreach (var controller in _controllers)
             controller.Initialize(this);
     }
-    private void PrepareControllers()
+
+    [ClientRpc]
+    private void RpcPrepareControllers() => BasePrepareControllers();
+    private void BasePrepareControllers()
     {
         foreach (var controller in _controllers)
         {

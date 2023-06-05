@@ -28,19 +28,17 @@ public class CameraController : BasePlayerController, ICameraController
     {
         _player = player;
 
+        _camera.Initialize();
+
         RpcInitialize();
     }
 
-    [ClientRpc]
+    [Client]
     private void RpcInitialize()
     {
         if (isLocalPlayer)
         { 
-            _input = GetComponent<ICameraInput>();
-
-            _camera.Initialize();
-
-            Debug.Log($"CameraController.RpcInitialize");            
+            _input = GetComponent<ICameraInput>();        
         }    
     }
 
@@ -81,10 +79,12 @@ public class CameraController : BasePlayerController, ICameraController
     private void LateUpdate() => ProcessLocalCameraInteraction();
     private void ProcessLocalCameraInteraction()
     {
+        if (Application.isFocused == false) return;
+
         if (isLocalPlayer)
         { 
             Rotate();
-            CmdMove();            
+            Move();            
         }
     }
 
@@ -97,15 +97,12 @@ public class CameraController : BasePlayerController, ICameraController
         _camera.SetRotation(Quaternion.Euler(_yAxis, _xAxis, 0f));
     }
 
-    [Command]
-    private void CmdMove() => RpcMove(_cameraOffset + _player.Position);
-
-    [ClientRpc]
-    private void RpcMove(Vector3 targetPosition)
+    [Client]
+    private void Move()
     {
         if (isLocalPlayer)
         {
-            _camera.SetPosition(targetPosition);
+            _camera.SetPosition(_cameraOffset + _player.Position);
         }
     }
 

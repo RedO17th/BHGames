@@ -44,7 +44,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         RpcInitializeInputs();
     }
 
-    [ClientRpc]
+    [Client]
     private void RpcInitializeInputs()
     {
         _walkInput = GetComponent<IWalktInput>();
@@ -53,7 +53,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     public override void Prepare()
     {
-        //_camera = _player.GetController<ICameraController>().Camera;
+        _camera = _player.GetController<ICameraController>().Camera;
     }
 
     public override void Enable()
@@ -84,7 +84,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
         if (isLocalPlayer)
         { 
-            GetInputDirectionThrowCamera();
+            GetInputDirectionThrowCameraFromClient();
 
             DefineMovementSpeed();
 
@@ -94,14 +94,12 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     }
 
     [Client]
-    private void GetInputDirectionThrowCamera()
+    private void GetInputDirectionThrowCameraFromClient()
     {
-        //if (_camera != null && _walkInput != null)
-        //    _direction = _camera.YRotation * _walkInput.Direction;
-        //else
-        //    _direction = Vector3.zero;
-
-        _clientDirection = (_walkInput != null) ? _walkInput.Direction : Vector3.zero;
+        if (_camera != null && _walkInput != null)
+            _clientDirection = _camera.YRotation * _walkInput.Direction;
+        else
+            _clientDirection = Vector3.zero;
     }
 
     [Client]
@@ -131,14 +129,14 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
             var rotation = Quaternion.LookRotation(_directionRotation);
             var targetRotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _rotationSpeed);
 
-            _player?.Rotate(targetRotation);
+            _player.Rotate(targetRotation);
         }
     }
 
     [Command]
     private void CmdMove(Vector3 direction, float speed)
     {
-        _player?.Move(direction.normalized * speed * Time.deltaTime);
+        _player.Move(direction.normalized * speed * Time.deltaTime);
     }
 
     //..
