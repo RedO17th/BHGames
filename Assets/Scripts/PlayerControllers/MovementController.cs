@@ -1,3 +1,4 @@
+using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -60,12 +61,15 @@ public class MovementController : BasePlayerController, IMovementController
         }
     }
 
+    [Server]
     public override void Enable()
     {
         base.Enable();
 
         EnableMechanics();
     }
+
+    [Server]
     private void EnableMechanics()
     {
         foreach (var mech in _mechanics)
@@ -74,6 +78,7 @@ public class MovementController : BasePlayerController, IMovementController
         }
     }
 
+    [Server]
     public override void Disable()
     {
         DisableMechanics();
@@ -90,10 +95,11 @@ public class MovementController : BasePlayerController, IMovementController
 
     public override void Deactivate()
     {
-        DisableMechanics();
         DeactivateMechanics();
 
         base.Deactivate();
+
+        RpcClear();
     }
     private void DeactivateMechanics()
     {
@@ -103,6 +109,8 @@ public class MovementController : BasePlayerController, IMovementController
         }
     }
 
+    [ClientRpc]
+    private void RpcClear() => Clear();
     protected override void Clear()
     {
         _movementMechanic = null;

@@ -53,8 +53,6 @@ public class CameraController : BasePlayerController, ICameraController
             enabled = true;
 
             _camera.gameObject.SetActive(true);
-
-            Debug.Log($"CameraController.RpcEnable I");
         }
     }
 
@@ -69,8 +67,6 @@ public class CameraController : BasePlayerController, ICameraController
             enabled = false;
 
             _camera.gameObject.SetActive(false);
-
-            Debug.Log($"CameraController.RpcDisable I");
         }
     }
 
@@ -106,16 +102,18 @@ public class CameraController : BasePlayerController, ICameraController
         }
     }
 
-    //..
     public override void Deactivate()
     {
-        _camera.Destroy();
-        _camera = null;
-
         base.Deactivate();
+
+        RpcClear();
     }
+
+    [ClientRpc]
+    private void RpcClear() => Clear();
     protected override void Clear()
     {
+        _camera = null;
         _player = null;
         _input = null;
 

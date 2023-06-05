@@ -27,12 +27,10 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     private float _minSpeed = 0f;
     private float _maxSpeed = 0f;
 
-    //Clients
     private IRunInput _runInput = null;
     private IWalktInput _walkInput = null;
 
     private Vector3 _clientDirection = Vector3.zero;
-    //..
 
     public override void Initialize(IPlayerController controller)
     {
@@ -63,18 +61,20 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         RpcEnable();
     }
 
-    public override void Disable()
-    {
-        base.Disable();
-
-        RpcDisable();
-    }
-
     [ClientRpc]
     private void RpcEnable() => enabled = true;
 
+    public override void Disable()
+    {
+        RpcDisable();
+        
+        base.Disable();
+    }
+
     [ClientRpc]
     private void RpcDisable() => enabled = false;
+
+    #region Movement
 
     [ClientCallback]
     private void Update() => ProcessLocalInputAndMove();
@@ -138,9 +138,17 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     {
         _player.Move(direction.normalized * speed * Time.deltaTime);
     }
+    #endregion
 
-    //..
-    public override void Deactivate() => base.Deactivate();
+    public override void Deactivate()
+    {
+        base.Deactivate();
+
+        RpcClear();
+    }
+
+    [ClientRpc]
+    private void RpcClear() => Clear();
     protected override void Clear()
     {
         _camera = null;

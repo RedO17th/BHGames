@@ -1136,8 +1136,7 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs: []
   timeInterpolationGui: 0
-  _subSystems:
-  - {fileID: 1089308127}
+  _subSystems: []
 --- !u!114 &1764608562
 MonoBehaviour:
   m_ObjectHideFlags: 0

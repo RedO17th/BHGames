@@ -12,8 +12,12 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 {
     [SerializeField] protected BaseSubSystem[] _subSystems;
 
+    private List<IPlayer> _players = null;
+
     public override void OnStartServer()
     {
+        _players = new List<IPlayer>();
+
         InitializeSubSystems();
         PrepareSubSystems();
 
@@ -31,33 +35,64 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
             system.Prepare();
     }
 
-    //Проверить, где это нужно
-    //protected virtual void OnEnable()
-    //{
-    //    SceneDataBus.OnContextEvent += ProcessContext;
-    //}
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
+    {
+        base.OnServerAddPlayer(conn);
 
-    //private void ProcessContext(BaseContext context)
-    //{
-    //    if (context is DashAmount dContext)
-    //    {
-    //        if (dContext.CollisionAmount == 3)
-    //        {
-    //            //StopSystems();
+        var player = conn?.identity?.gameObject.GetComponent<IPlayer>();
 
-    //            //Заглушка
-    //            //SceneManager.LoadScene(0);
-    //        }
-    //    }
-    //}
+        if (player != null)
+        {
+            player.Initialize();
+            player.Enable();
 
-    [ServerCallback]
-    protected virtual void OnDisable() => StopSystems();
+            //player.SetPosition(point.Position);
+
+            _players.Add(player);
+        }
+    }
+
+    public override void OnServerDisconnect(NetworkConnectionToClient conn)
+    {
+        var player = conn.identity.gameObject.GetComponent<IPlayer>();
+
+        if (player != null)
+        {
+            _players.Remove(player);
+
+            player.Disable();
+            player.Deactivate();
+            player.Remove();
+        }
+
+        base.OnServerDisconnect(conn);
+    }
+
+    public override void OnStopServer()
+    {
+        //StopSystems();
+
+        foreach (var player in _players)
+        {
+            player.Disable();
+        }
+
+        foreach (var player in _players)
+        { 
+            player.Deactivate();
+        }
+
+        foreach (var player in _players)
+        {
+            player.Remove();
+        }
+
+        _players.Clear();
+        _players = null;
+    }
 
     private void StopSystems()
     {
-        //SceneDataBus.OnContextEvent -= ProcessContext;
-
         foreach (var system in _subSystems)
             system.Stop();
 
@@ -68,30 +103,5 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 
 public class SceneSystem : BaseSceneSystem
 {
-    public override void OnServerConnect(NetworkConnectionToClient conn)
-    {
-        base.OnServerConnect(conn);
 
-        Debug.Log($"SceneSystem.OnServerConnect");
-    }
-
-    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-    {
-        base.OnServerAddPlayer(conn);
-
-        var player = conn?.identity?.gameObject.GetComponent<IPlayer>();
-
-        if (player != null)
-        {
-            Debug.Log($"SceneSystem.OnServerAddPlayer");
-
-            //SceneDataBus.SendContext(new AddPlayer(player));
-
-            player.Initialize();
-            player.Enable();
-            
-            //player.SetPosition(point.Position);
-
-        }
-    }
 }

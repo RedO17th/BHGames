@@ -14,6 +14,8 @@ public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDam
     T GetController<T>() where T : class;
 
     void SetPosition(Vector3 position);
+
+    void Remove();
 }
 
 public class BasePlayer : NetworkBehaviour, IPlayer
@@ -149,7 +151,6 @@ public class BasePlayer : NetworkBehaviour, IPlayer
 
     public virtual void Deactivate()
     {
-        DisableControllers();
         DeactivateControllers();
 
         _damageController = null;
@@ -163,4 +164,14 @@ public class BasePlayer : NetworkBehaviour, IPlayer
             controller.Deactivate();
         }
     }
+
+    public void Remove()
+    {
+        Destroy(gameObject);
+
+        RpcRemove();
+    }
+
+    [ClientRpc]
+    private void RpcRemove() => Destroy(gameObject);
 }
