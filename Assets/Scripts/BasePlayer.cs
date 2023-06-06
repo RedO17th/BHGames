@@ -1,4 +1,5 @@
 using Mirror;
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -125,9 +126,17 @@ public class BasePlayer : NetworkBehaviour, IPlayer
 
     [ClientRpc]
     private void RpcMove(Vector3 position) => BaseMove(position);
-    
-    //..
-    public virtual void Dash(Vector3 position) => _controller.Move(position);
+
+    [Server]
+    public virtual void Dash(Vector3 position)
+    {
+        RpcDash(position);
+        BaseDash(position);
+    }
+
+    [ClientRpc]
+    private void RpcDash(Vector3 position) => BaseDash(position);
+    private void BaseDash(Vector3 position) => _controller.Move(position);
     #endregion
 
     [ServerCallback]

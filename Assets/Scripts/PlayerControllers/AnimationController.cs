@@ -9,26 +9,25 @@ public class AnimationController : BasePlayerController
     private IPlayer _player = null;
     private IMovementController _movementController = null;
 
-    public override void Initialize(IPlayer player)
+    public override void Initialize(IPlayer player) => LocalInitialize(player);
+    private void LocalInitialize(IPlayer player)
     {
-        _player = player;
+        if (isLocalPlayer)
+        {
+            _player = player;
+        }
     }
 
-    public override void Prepare()
+    public override void Prepare() => LocalPrepare();
+    private void LocalPrepare()
     {
-        _movementController = _player.GetController<IMovementController>();
-
-        Debug.Log($"AnimationController.Prepare: MovementController is { _movementController != null } ");
+        if (isLocalPlayer)
+        {
+            _movementController = _player.GetController<IMovementController>();
+        }
     }
 
-    public override void Enable()
-    {
-        base.Enable();
-
-        Debug.Log($"AnimationController.Enable: Server");
-
-        RpcLocalEnable();
-    }
+    public override void Enable() => RpcLocalEnable();
 
     [ClientRpc]
     private void RpcLocalEnable()
@@ -37,11 +36,13 @@ public class AnimationController : BasePlayerController
         {
             enabled = true;
 
-            //PlayerDataBus.OnContextEvent += ProcessDashContext;
+            PlayerDataBus.OnContextEvent += ProcessDashContext;
         }
     }
 
     #region Dash
+
+    [Client]
     private void ProcessDashContext(BaseContext context)
     {
         if (context is DashContext dContext)
@@ -52,18 +53,16 @@ public class AnimationController : BasePlayerController
             }
         }
     }
-
     private void ProcessDashAnimation(bool enabled)
     {
         BaseDash(enabled);
 
-        CmdDash(enabled);
+        //CmdDash(enabled);
     }
-
     private void BaseDash(bool enabled) => _animator.SetBool("Dash", enabled);
 
-    [Command]
-    private void CmdDash(bool enabled) => BaseDash(enabled);
+    //[Command]
+    //private void CmdDash(bool enabled) => BaseDash(enabled);
     #endregion
 
     #region Move
@@ -73,12 +72,7 @@ public class AnimationController : BasePlayerController
     private void Move() => _animator.SetFloat("Speed", _movementController.Speed);
     #endregion
 
-    public override void Disable()
-    {
-        base.Disable();
-
-        RpcLocalDisable();
-    }
+    public override void Disable() => RpcLocalDisable();
 
     [ClientRpc]
     private void RpcLocalDisable()
@@ -87,12 +81,20 @@ public class AnimationController : BasePlayerController
         { 
             enabled = false;
 
-            //PlayerDataBus.OnContextEvent -= ProcessDashContext;            
+            PlayerDataBus.OnContextEvent -= ProcessDashContext;            
         }
     }
 
-    public override void Deactivate() => base.Deactivate();
+    public override void Deactivate() => LocalDeactivate();
+    private void LocalDeactivate()
+    {
+        if (isLocalPlayer)
+        {
+            base.Deactivate();
+        }
+    }
 
+    [Client]
     protected override void Clear()
     {
         _movementController = null;

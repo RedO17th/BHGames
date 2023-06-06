@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using UnityEngine;
 
@@ -37,17 +38,52 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         
         _player = movementController.Player;
 
-        _input = GetComponent<IPlayerDashInput>();
-
         _movementMechanic = movementController.GetMechanic<IMovementMechanic>();
+
+        LocalInitialize(controller);
     }
 
-    public override void Disable()
+    [Client]
+    private void LocalInitialize(IPlayerController controller)
     {
-        StopMechanic();
+        if (isLocalPlayer)
+        {
+            var movementController = controller as IMovementController;
 
-        enabled = false;
+            _player = movementController.Player;
+
+            _input = GetComponent<IPlayerDashInput>();
+
+            _movementMechanic = movementController.GetMechanic<IMovementMechanic>();
+        }
     }
+
+    public override void Enable() => RpcLocalEnable();
+
+    [ClientRpc]
+    private void RpcLocalEnable()
+    {
+        if (isLocalPlayer)
+        {
+            enabled = true;
+        }
+    }
+
+
+    public override void Disable() => RpcLocalDisable();
+
+    [ClientRpc]
+    private void RpcLocalDisable()
+    {
+        if (isLocalPlayer)
+        {
+            enabled = false;
+
+            StopMechanic();
+        }
+    }
+
+    [Client]
     private void StopMechanic()
     {
         if (_dashRoutine != null)
@@ -56,6 +92,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         CompleteDash();
     }
 
+    [ClientCallback]
     private void Update() => ProcessInputAndDash();
     private void ProcessInputAndDash()
     {
@@ -72,7 +109,8 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         while (CanContinue())
         {
-            _player.Dash(_player.Forward * _dashSpeed * Time.deltaTime);
+            //_player.Dash(_player.Forward * _dashSpeed * Time.deltaTime);
+            CmdDash(_player.Forward * _dashSpeed * Time.deltaTime);
 
             yield return null;
         }
@@ -84,7 +122,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     {
         _inProcess = true;
 
-        _movementMechanic.Disable();
+        CmdDisableMovementMechanic();
 
         _startedDashTime = Time.time;
 
@@ -93,7 +131,13 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         PlayerDataBus.SendContext(new DashContext(_player, enabled: true));
     }
 
+    [Command]
+    private void CmdDisableMovementMechanic() => _movementMechanic.Disable(); 
+
     private bool CanContinue() => Time.time < (_startedDashTime + _dashTime);
+
+    [Command]
+    private void CmdDash(Vector3 position) => _player.Dash(position);
 
     private void CompleteDash()
     {
@@ -102,15 +146,24 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         _inProcess = false;
 
-        _movementMechanic.Enable();
+        CmdEnableMovementMechanic();
 
         PlayerDataBus.SendContext(new DashContext(_player, enabled: false));
     }
 
+    [Command]
+    private void CmdEnableMovementMechanic() => _movementMechanic.Enable();
+
+
     public override void Deactivate()
     {
         base.Deactivate();
+
+        RpcClear();
     }
+
+    [ClientRpc]
+    private void RpcClear() => Clear();
 
     protected override void Clear()
     {

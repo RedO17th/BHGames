@@ -37,29 +37,37 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         var movementController = controller as IMovementController;
 
         _player = movementController.Player;
-        _maxSpeed = _runSpeed;
 
-        RpcInitializeInputs();
-    }
+        RpcLocalInitialize(controller);
+    }    
 
     [Client]
-    private void RpcInitializeInputs()
+    private void RpcLocalInitialize(IPlayerController controller)
     {
-        _walkInput = GetComponent<IWalktInput>();
-        _runInput = GetComponent<IRunInput>();
+        if (isLocalPlayer)
+        {
+            var movementController = controller as IMovementController;
+
+            _player = movementController.Player;
+            _maxSpeed = _runSpeed;
+
+            _walkInput = GetComponent<IWalktInput>();
+            _runInput = GetComponent<IRunInput>();
+        }
     }
 
-    public override void Prepare()
+    public override void Prepare() => LocalPrepare();
+
+    [Client]
+    private void LocalPrepare()
     {
-        _camera = _player.GetController<ICameraController>().Camera;
+        if (isLocalPlayer)
+        {
+            _camera = _player.GetController<ICameraController>().Camera;
+        }
     }
 
-    public override void Enable()
-    {
-        base.Enable();
-
-        RpcLocalEnable();
-    }
+    public override void Enable() => RpcLocalEnable();
 
     [ClientRpc]
     private void RpcLocalEnable()
@@ -70,12 +78,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         }
     }
 
-    public override void Disable()
-    {
-        base.Disable();
-
-        RpcLocalDisable();
-    }
+    public override void Disable() => RpcLocalDisable();
 
     [ClientRpc]
     private void RpcLocalDisable()
