@@ -17,15 +17,31 @@ public class AnimationController : BasePlayerController
     public override void Prepare()
     {
         _movementController = _player.GetController<IMovementController>();
+
+        Debug.Log($"AnimationController.Prepare: MovementController is { _movementController != null } ");
     }
 
     public override void Enable()
     {
         base.Enable();
 
-        PlayerDataBus.OnContextEvent += ProcessDashContext;
+        Debug.Log($"AnimationController.Enable: Server");
+
+        RpcLocalEnable();
     }
 
+    [ClientRpc]
+    private void RpcLocalEnable()
+    {
+        if (isLocalPlayer)
+        {
+            enabled = true;
+
+            //PlayerDataBus.OnContextEvent += ProcessDashContext;
+        }
+    }
+
+    #region Dash
     private void ProcessDashContext(BaseContext context)
     {
         if (context is DashContext dContext)
@@ -48,30 +64,31 @@ public class AnimationController : BasePlayerController
 
     [Command]
     private void CmdDash(bool enabled) => BaseDash(enabled);
+    #endregion
 
     #region Move
-
-    [Client]
+    [ClientCallback]
     private void Update() => ProcessAnimations();
     private void ProcessAnimations() => Move();
-    private void Move()
-    {
-        BaseMove(_movementController.Speed);
-
-        CmdMove(_movementController.Speed);
-    }
-
-    private void BaseMove(float speed) => _animator.SetFloat("Speed", speed);
-
-    [Command]
-    private void CmdMove(float speed) => BaseMove(speed);
+    private void Move() => _animator.SetFloat("Speed", _movementController.Speed);
     #endregion
 
     public override void Disable()
     {
-        PlayerDataBus.OnContextEvent -= ProcessDashContext;
-
         base.Disable();
+
+        RpcLocalDisable();
+    }
+
+    [ClientRpc]
+    private void RpcLocalDisable()
+    {
+        if (isLocalPlayer)
+        { 
+            enabled = false;
+
+            //PlayerDataBus.OnContextEvent -= ProcessDashContext;            
+        }
     }
 
     public override void Deactivate() => base.Deactivate();

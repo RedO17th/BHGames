@@ -58,21 +58,33 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     {
         base.Enable();
 
-        RpcEnable();
+        RpcLocalEnable();
     }
 
     [ClientRpc]
-    private void RpcEnable() => enabled = true;
+    private void RpcLocalEnable()
+    {
+        if (isLocalPlayer)
+        {
+            enabled = true;
+        }
+    }
 
     public override void Disable()
     {
-        RpcDisable();
-        
         base.Disable();
+
+        RpcLocalDisable();
     }
 
     [ClientRpc]
-    private void RpcDisable() => enabled = false;
+    private void RpcLocalDisable()
+    {
+        if (isLocalPlayer)
+        { 
+            enabled = false;
+        }
+    }
 
     #region Movement
 
@@ -82,19 +94,16 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
     {
         if (Application.isFocused == false) return;
 
-        if (isLocalPlayer)
-        { 
-            GetInputDirectionThrowCameraFromClient();
+        GetInputDirectionThrowCamera();
 
-            DefineMovementSpeed();
+        DefineMovementSpeed();
 
-            CmdRotate(_clientDirection);
-            CmdMove(_clientDirection, _currentSpeed);
-        }
+        CmdRotate(_clientDirection);
+        CmdMove(_clientDirection, _currentSpeed);
     }
 
     [Client]
-    private void GetInputDirectionThrowCameraFromClient()
+    private void GetInputDirectionThrowCamera()
     {
         if (_camera != null && _walkInput != null)
             _clientDirection = _camera.YRotation * _walkInput.Direction;
