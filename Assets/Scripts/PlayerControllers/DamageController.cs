@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public interface IDamageController : IDamagable { } 
 
@@ -9,7 +10,6 @@ public class DamageController : BasePlayerController, IDamageController
 {
     [Range(1f, 5f)]
     [SerializeField] private float _time;
-
 
     public bool CanDamaged => _canDamaged;
 
@@ -20,6 +20,7 @@ public class DamageController : BasePlayerController, IDamageController
 
     private bool _canDamaged = true;
 
+    [Server]
     public override void Initialize(IPlayer player)
     {
         _player = player;
@@ -27,17 +28,11 @@ public class DamageController : BasePlayerController, IDamageController
 
     public override void Prepare() { }
 
+    [Server]
     public override void Enable() => base.Enable();
-    public override void Disable()
-    {
-        if (_damageRoutine != null)
-            StopCoroutine(DamageCoroutine());
 
-        _damageRoutine = null;
 
-        base.Disable();
-    }
-
+    [Server]
     public void Damage() => ProcessDamage();
     private void ProcessDamage()
     {
@@ -63,6 +58,19 @@ public class DamageController : BasePlayerController, IDamageController
     private void ProcessBeginMechanic() => PlayerDataBus.SendContext(new DamageContext(_player, begin: true));
     private void ProcessEndMechanic() => PlayerDataBus.SendContext(new DamageContext(_player, begin: false));
 
+    [Server]
+    public override void Disable()
+    {
+        if (_damageRoutine != null)
+            StopCoroutine(DamageCoroutine());
+
+        _damageRoutine = null;
+
+        base.Disable();
+    }
+
+
+    [Server]
     public override void Deactivate()
     {
         _canDamaged = true;

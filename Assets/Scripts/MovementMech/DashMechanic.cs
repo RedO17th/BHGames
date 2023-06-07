@@ -109,7 +109,6 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         while (CanContinue())
         {
-            //_player.Dash(_player.Forward * _dashSpeed * Time.deltaTime);
             CmdDash(_player.Forward * _dashSpeed * Time.deltaTime);
 
             yield return null;
@@ -122,6 +121,7 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     {
         _inProcess = true;
 
+        CmdSetProcessState(_inProcess);
         CmdDisableMovementMechanic();
 
         _startedDashTime = Time.time;
@@ -130,6 +130,9 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         PlayerDataBus.SendContext(new DashContext(_player, enabled: true));
     }
+
+    [Command]
+    private void CmdSetProcessState(bool state) => _inProcess = state;
 
     [Command]
     private void CmdDisableMovementMechanic() => _movementMechanic.Disable(); 
@@ -146,9 +149,10 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
 
         _inProcess = false;
 
-        CmdEnableMovementMechanic();
-
         PlayerDataBus.SendContext(new DashContext(_player, enabled: false));
+
+        CmdSetProcessState(_inProcess);
+        CmdEnableMovementMechanic();
     }
 
     [Command]

@@ -25,7 +25,6 @@ public class BasePlayer : NetworkBehaviour, IPlayer
 
     [SerializeField] private BasePlayerController[] _controllers;
 
-
     public bool CanDamaged => _damageController.CanDamaged;
     public Vector3 Forward => transform.forward;
     public Vector3 Position

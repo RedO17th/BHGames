@@ -1,24 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public class MaterialController : BasePlayerController
 {
     [SerializeField] private SkinnedMeshRenderer _renderer;
     [SerializeField] private Material _material;
+    [SerializeField] private Material _sourceMaterial;
 
     private IPlayer _player = null;
-
-    private Material _sourceMaterial = null;
 
     public override void Initialize(IPlayer player)
     {
         _player = player;
-        _sourceMaterial = _renderer.material;
     }
 
     public override void Prepare() { }
 
+    [Server]
     public override void Enable()
     {
         base.Enable();
@@ -26,6 +26,7 @@ public class MaterialController : BasePlayerController
         PlayerDataBus.OnContextEvent += ProcessContext;
     }
 
+    [Server]
     private void ProcessContext(BaseContext context)
     {
         if (context is DamageContext dContext)
@@ -37,31 +38,48 @@ public class MaterialController : BasePlayerController
         }
     }
 
-    private void ProcessDamageContext(bool switchMaterial)
+    private void ProcessDamageContext(bool switchMaterial) => SetMaterial(switchMaterial);
+    private void SetMaterial(bool switchMaterial)
     {
-        var material = (switchMaterial) ? _material : _sourceMaterial;
+        BaseSetMaterial(switchMaterial);
 
-        SetMaterial(material);
+        RpcSetMaterial(switchMaterial);
     }
 
-    private void SetMaterial(Material material) => _renderer.material = material;
+    private void BaseSetMaterial(bool switchMaterial)
+    {
+        _renderer.material = (switchMaterial) ? _material : _sourceMaterial;
+    }
 
+    [ClientRpc]
+    private void RpcSetMaterial(bool switchMaterial) => BaseSetMaterial(switchMaterial);
+
+    [Server]
     public override void Disable()
     {
         PlayerDataBus.OnContextEvent -= ProcessContext;
 
         base.Disable();
-    }    
+    }
 
+    [Server]
     public override void Deactivate()
     {
-        SetMaterial(_sourceMaterial);
+        SetMaterial(false);
 
         base.Deactivate();
     }
     protected override void Clear()
     {
-        _sourceMaterial = null;
+        BaseClear();
+        RpcClear();
+    }
+
+    private void BaseClear()
+    {
         _player = null;
     }
+
+    [ClientRpc]
+    private void RpcClear() => BaseClear();
 }
