@@ -25,6 +25,8 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
             _uiCounter.Initialize(this);
             _uiCounter.SetAmount(0);
+
+            _amountCollisions = 0;
         }
     }
 
@@ -33,21 +35,23 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     {
         base.Enable();
 
-        _amountCollisions = 0;
-
         _uiCounter.Enable();
 
+        SceneDataBus.OnContextEvent += ProcessContext;
         PlayerDataBus.OnContextEvent += ProcessContext;
     }
 
     private void ProcessContext(BaseContext context)
     {
-        if(IsNecessaryContext(context))
+        if (IsCollisionContext(context))
         {
             DisplayCollisionAmount();
         }
+
+        ProcessNewClientContext(context);
     }
-    private bool IsNecessaryContext(BaseContext context)
+    //..
+    private bool IsCollisionContext(BaseContext context)
     {
         bool result = false;
 
@@ -69,6 +73,16 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         //SceneDataBus.SendContext(new DashAmount(_amountCollisions));
     }
+    //..
+
+    private void ProcessNewClientContext(BaseContext context)
+    {
+        if (context is NewClient ncContext)
+        {
+            ShowCollisionCounter();
+        }
+    }
+    private void ShowCollisionCounter() => _uiCounter.Enable();
 
 
     [Server]
@@ -78,6 +92,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         _uiCounter.Disable();
 
+        SceneDataBus.OnContextEvent -= ProcessContext;
         PlayerDataBus.OnContextEvent -= ProcessContext;
     }
 

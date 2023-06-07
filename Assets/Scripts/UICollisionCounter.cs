@@ -41,7 +41,12 @@ public class UICollisionCounter : NetworkBehaviour, IEnabable, IDisabable
     }
 
     [ClientRpc]
-    private void RpcEnable() => BaseEnable();
+    private void RpcEnable()
+    {
+        BaseEnable();
+
+        Debug.Log($"UICollisionCounter.RpcEnable");
+    }
     private void BaseEnable() => _canvas.SetActive(true);
 
     public void Disable()

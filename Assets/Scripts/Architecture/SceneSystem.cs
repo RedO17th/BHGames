@@ -49,6 +49,8 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
             //player.SetPosition(point.Position);
 
             _players.Add(player);
+
+            SceneDataBus.SendContext(new NewClient());
         }
     }
 

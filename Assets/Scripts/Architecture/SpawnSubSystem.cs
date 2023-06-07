@@ -42,10 +42,10 @@ public class SpawnSubSystem : BaseSubSystem
     //[Server]
     private void ProcessContextSignal(BaseContext context)
     {
-        if (context is AddPlayer cContext)
-        {
-            ProcessAddPlayerContext(cContext.Player);
-        }
+        //if (context is AddPlayer cContext)
+        //{
+        //    ProcessAddPlayerContext(cContext.Player);
+        //}
     }
 
     private void ProcessAddPlayerContext(IPlayer player)
