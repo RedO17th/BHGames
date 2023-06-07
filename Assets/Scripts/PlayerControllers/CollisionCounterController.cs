@@ -1,3 +1,4 @@
+using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,12 +19,16 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
     public override void Initialize(IPlayer player)
     {
-        Player = player;
+        if (isServerOnly)
+        { 
+            Player = player;
 
-        _uiCounter.Initialize(this);
-        _uiCounter.SetAmount(0);
+            _uiCounter.Initialize(this);
+            _uiCounter.SetAmount(0);
+        }
     }
 
+    [Server]
     public override void Enable()
     {
         base.Enable();
@@ -62,9 +67,11 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
         _uiCounter.SetAmount(_amountCollisions);
 
-        SceneDataBus.SendContext(new DashAmount(_amountCollisions));
+        //SceneDataBus.SendContext(new DashAmount(_amountCollisions));
     }
 
+
+    [Server]
     public override void Disable()
     {
         base.Disable();
@@ -74,6 +81,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
         PlayerDataBus.OnContextEvent -= ProcessContext;
     }
 
+    [Server]
     public override void Deactivate()
     {
         _uiCounter.SetAmount(0);

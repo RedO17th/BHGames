@@ -66,7 +66,7 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
             {
                 enemy.Damage();
 
-                //ProcessCollisionWithEnemyContext();
+                ProcessCollisionWithEnemyContext();
             }
         }
     }
