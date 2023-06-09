@@ -43,28 +43,22 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
     private void ProcessContext(BaseContext context)
     {
-        if (IsCollisionContext(context))
-        {
-            DisplayCollisionAmount();
-        }
-
+        ProcessCollisionContext(context);
         ProcessContextForPreviousClients(context);
     }
-    //..
-    private bool IsCollisionContext(BaseContext context)
-    {
-        bool result = false;
 
+    private void ProcessCollisionContext(BaseContext context)
+    {
         if (context is CollisionContext ceContext)
         {
             if (ceContext.Player == Player)
             {
-                result = true;
+                DisplayCollisionAmount();
             }
         }
-
-        return result;
     }
+    
+    //Send context about DashAmount
     private void DisplayCollisionAmount()
     {
         _amountCollisions++;
