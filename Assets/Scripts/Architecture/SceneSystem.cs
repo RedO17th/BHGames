@@ -50,7 +50,7 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 
             _players.Add(player);
 
-            SceneDataBus.SendContext(new NewClient());
+            SceneDataBus.SendContext(new NewClient(player));
         }
     }
 

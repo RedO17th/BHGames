@@ -33,7 +33,11 @@ public class DashAmount : BaseContext
 
 public class NewClient : BaseContext
 {
-    public NewClient() { }
+    public IPlayer Client { get; private set; }
+    public NewClient(IPlayer client)
+    {
+        Client = client;
+    }
 }
 
 public static class PlayerDataBus

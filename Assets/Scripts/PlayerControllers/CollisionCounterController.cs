@@ -48,7 +48,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
             DisplayCollisionAmount();
         }
 
-        ProcessNewClientContext(context);
+        ProcessContextForPreviousClients(context);
     }
     //..
     private bool IsCollisionContext(BaseContext context)
@@ -75,14 +75,21 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     }
     //..
 
-    private void ProcessNewClientContext(BaseContext context)
+    private void ProcessContextForPreviousClients(BaseContext context)
     {
         if (context is NewClient ncContext)
         {
-            ShowCollisionCounter();
+            if (ncContext.Client != Player)
+            {
+                ShowCounter();
+            }
         }
     }
-    private void ShowCollisionCounter() => _uiCounter.Enable();
+    private void ShowCounter()
+    {
+        _uiCounter.SetAmount(_amountCollisions);
+        _uiCounter.Enable();
+    }
 
 
     [Server]
