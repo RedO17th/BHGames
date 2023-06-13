@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da818c8ac6bdc0a4e9c588dc80e7fac9, type: 3}
+  m_Name: MapSet
+  m_EditorClassIdentifier: 
+  _scenes:
+  - _type: 0
+    _scene: Assets/Scenes/Lobby.unity
+  - _type: 1
+    _scene: Assets/Scenes/Game.unity

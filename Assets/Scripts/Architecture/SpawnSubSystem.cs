@@ -5,7 +5,7 @@ using Mirror;
 
 public class SpawnSubSystem : BaseSubSystem
 {
-    [SerializeField] private BasePlayer _playerPrefab;
+    [SerializeField] private BaseNetworkPlayer _playerPrefab;
 
     [SerializeField] private BaseSpawnPoint[] _points;
 

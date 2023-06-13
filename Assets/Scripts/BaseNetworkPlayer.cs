@@ -19,7 +19,7 @@ public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDam
     void Remove();
 }
 
-public class BasePlayer : NetworkBehaviour, IPlayer
+public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
 {
     [SerializeField] private CharacterController _controller = null;
 
@@ -57,6 +57,21 @@ public class BasePlayer : NetworkBehaviour, IPlayer
         return result;
     }
     #endregion
+
+    //Убрать
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        DontDestroyOnLoad(gameObject);
+    }
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        DontDestroyOnLoad(gameObject);
+    }
+    //..
 
     #region Initialization
     public virtual void Initialize()
