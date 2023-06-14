@@ -58,21 +58,6 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
     }
     #endregion
 
-    //Убрать
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-
-        DontDestroyOnLoad(gameObject);
-    }
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        DontDestroyOnLoad(gameObject);
-    }
-    //..
-
     #region Initialization
     public virtual void Initialize()
     {

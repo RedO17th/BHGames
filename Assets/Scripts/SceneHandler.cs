@@ -45,6 +45,8 @@ public class SceneHandler : ISceneHandler
 
         if (scene != null)
         {
+            _currentScene = scene.Type;
+
             _lobbyNetManager.ServerChangeScene(scene.Name);
 
             SceneManager.sceneLoaded += ProcessSceneLoadedEvent;

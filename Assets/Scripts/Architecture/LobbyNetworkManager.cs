@@ -25,11 +25,8 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     [Header("Game player")]
     [SerializeField] private BaseNetworkPlayer _gamePlayerPrefab = null;
 
-    //public static event Action OnClientConnected;
-    //public static event Action OnClientDisconnected;
-
-    //Test
-    public List<BaseNetworkLobbyPlayer> _roomPlayers = new List<BaseNetworkLobbyPlayer>();
+    //TODO - Позаботиться о списках
+    private List<NetworkConnectionToClient> _connections = new List<NetworkConnectionToClient>();
     public List<BaseNetworkPlayer> _gamePlayers = new List<BaseNetworkPlayer>();
 
     private SceneHandler _sceneHandler = null;
@@ -38,19 +35,6 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         _sceneHandler = new SceneHandler(this, _mapSet);
     }
-
-    //public override void OnClientConnect()
-    //{
-    //    base.OnClientConnect();
-
-    //    //OnClientConnected?.Invoke();
-    //}
-    //public override void OnClientDisconnect()
-    //{
-    //    base.OnClientDisconnect();
-
-    //    //OnClientDisconnected?.Invoke();
-    //}
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
@@ -65,41 +49,15 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
             conn.Disconnect();
             return;
         }
+
+        _connections.Add(conn);
     }
-    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-    {
-        if (_sceneHandler.CanAddNewPlayer())
-        {
-            var roomPlayer = Instantiate(_roomPlayerPrefab);
-
-            _roomPlayers.Add(roomPlayer);
-
-            NetworkServer.AddPlayerForConnection(conn, roomPlayer.gameObject);
-        }
-    }
-
-    //??
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        //if (conn.identity != null)
-        //{
-        //    var player = conn.identity.GetComponent<NetworkRoomPlayerLobby>();
+         _connections.Remove(conn);
 
-        //    RoomPlayers.Remove(player);
-
-        //    NotifyPlayersOfReadyState();
-        //}
-
-        //base.OnServerDisconnect(conn);
+        base.OnServerDisconnect(conn);
     }
-    public void NotifyPlayersOfReadyState()
-    {
-        //foreach (var player in RoomPlayers)
-        //{
-        //    player.HandleReadyToStart(IsReadyToStart());
-        //}
-    }
-    //..
 
     [ContextMenu("Start game")]
     private void StartGame()
@@ -117,43 +75,45 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         //if (numPlayers < _minPlayers) { return false; }
 
-        foreach (var player in _roomPlayers)
-        {
-            if (player.IsReady == false)
-                return false;
-        }
+        //foreach (var player in _roomPlayers)
+        //{
+        //    if (player.IsReady == false)
+        //        return false;
+        //}
 
         return true;
     }
 
     private void ProcessSceneLoadedEvent()
     {
-        Debug.Log($"LobbyNetworkManager.ProcessSceneLoadedEvent");
+        Debug.Log($"LobbyNetworkManager.ProcessSceneLoadedEvent: Connections { _connections.Count }");
 
-        //for (int i = 0; i < _roomPlayers.Count; i++)
-        //{
-        //    var conn = _roomPlayers[i].connectionToClient;
-        //    var player = Instantiate(_gamePlayerPrefab);
+        for (int i = 0; i < _connections.Count; i++)
+        {
+            var conn = _connections[i];
+            var player = Instantiate(_gamePlayerPrefab);
 
-        //    if (player != null)
-        //    {
-        //        NetworkServer.Destroy(conn.identity.gameObject);
-        //        NetworkServer.ReplacePlayerForConnection(conn, player.gameObject);
+            if (player != null)
+            {
+                _gamePlayers.Add(player.GetComponent<BaseNetworkPlayer>());
 
-        //        //player.Initialize();
-        //        //player.Enable();
+                NetworkServer.AddPlayerForConnection(conn, player.gameObject);
 
-        //        _gamePlayers.Add(player.GetComponent<BaseNetworkPlayer>());
-        //    }
-        //    else
-        //    {
-        //        Debug.Log($"LobbyNetworkManager.ServerChangeScene: Player is null ");
-        //  
+                player.Initialize();
+                player.Enable();
+
+                SceneDataBus.SendContext(new NewClient(player));
+            }
+            else
+            {
+                Debug.Log($"LobbyNetworkManager.ServerChangeScene: Player is null ");
+            }
+        }
     }
 
     public override void OnStopServer()
     {
-        _roomPlayers.Clear();
+        //_roomPlayers.Clear();
         
         _sceneHandler = null;
     }
