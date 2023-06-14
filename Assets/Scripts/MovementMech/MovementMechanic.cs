@@ -38,17 +38,14 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
         _player = movementController.Player;
 
-        RpcLocalInitialize(controller);
+        LocalInitialize(controller);
     }    
 
     [Client]
-    private void RpcLocalInitialize(IPlayerController controller)
+    private void LocalInitialize(IPlayerController controller)
     {
         if (isLocalPlayer)
         {
-            var movementController = controller as IMovementController;
-
-            _player = movementController.Player;
             _maxSpeed = _runSpeed;
 
             _walkInput = GetComponent<IWalktInput>();

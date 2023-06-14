@@ -284,7 +284,7 @@ MonoBehaviour:
   _minPlayers: 2
   _roomPlayerPrefab: {fileID: 9216187963085781111, guid: 29435cac3a9079b4cb2f7ada0f306290, type: 3}
   _gamePlayerPrefab: {fileID: 1606848104187943762, guid: 5617a763cefda934e9dab319638d38e0, type: 3}
-  _gamePlayers: []
+  _lobbyPlayers: []
 --- !u!114 &1559056856
 MonoBehaviour:
   m_ObjectHideFlags: 0

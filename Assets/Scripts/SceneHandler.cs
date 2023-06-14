@@ -14,6 +14,8 @@ public interface ISceneHandler
     bool CanAddNewConnection();
     bool CanStartGame();
 
+    bool IsGamePlay();
+
     bool SwitchTo(SceneType type);
 }
 
@@ -37,6 +39,7 @@ public class SceneHandler : ISceneHandler
     public bool CanAddNewPlayer() => _currentScene == SceneType.Lobby;
     public bool CanAddNewConnection() => _currentScene == SceneType.Lobby;
     public bool CanStartGame() => _currentScene == SceneType.Lobby;
+    public bool IsGamePlay() => _currentScene == SceneType.Game;
 
     public bool SwitchTo(SceneType type) => ProcessSceneSwitching(type);
     private bool ProcessSceneSwitching(SceneType type)
@@ -76,4 +79,6 @@ public class SceneHandler : ISceneHandler
 
         OnSceneLoaded?.Invoke();
     }
+
+
 }

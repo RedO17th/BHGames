@@ -26,37 +26,30 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     [SerializeField] private BaseNetworkPlayer _gamePlayerPrefab = null;
 
     //TODO - Позаботиться о списках
-    private List<NetworkConnectionToClient> _connections = new List<NetworkConnectionToClient>();
-    public List<BaseNetworkPlayer> _gamePlayers = new List<BaseNetworkPlayer>();
+    private List<IPlayer> _gamePlayers;
+    public List<BaseNetworkLobbyPlayer> _lobbyPlayers;
 
-    private SceneHandler _sceneHandler = null;
+    private ISceneHandler _sceneHandler = null;
 
     public override void OnStartServer()
     {
         _sceneHandler = new SceneHandler(this, _mapSet);
+
+        _gamePlayers = new List<IPlayer>();
+        _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
     }
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
-        if (numPlayers >= maxConnections)
+        if (_sceneHandler.CanAddNewPlayer())
         {
-            conn.Disconnect();
-            return;
+            var lobbyPlayer = Instantiate(_roomPlayerPrefab);
+                lobbyPlayer.transform.parent = transform;
+
+            _lobbyPlayers.Add(lobbyPlayer);
+
+            NetworkServer.AddPlayerForConnection(conn, lobbyPlayer.gameObject);
         }
-
-        if (_sceneHandler.CanAddNewConnection() == false)
-        {
-            conn.Disconnect();
-            return;
-        }
-
-        _connections.Add(conn);
-    }
-    public override void OnServerDisconnect(NetworkConnectionToClient conn)
-    {
-         _connections.Remove(conn);
-
-        base.OnServerDisconnect(conn);
     }
 
     [ContextMenu("Start game")]
@@ -70,51 +63,74 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
             }
         }
     }
-
     private bool IsReadyToStart()
     {
         //if (numPlayers < _minPlayers) { return false; }
 
-        //foreach (var player in _roomPlayers)
-        //{
-        //    if (player.IsReady == false)
-        //        return false;
-        //}
+        foreach (var player in _lobbyPlayers)
+        {
+            if (player.IsReady == false)
+                return false;
+        }
 
         return true;
     }
-
     private void ProcessSceneLoadedEvent()
     {
-        Debug.Log($"LobbyNetworkManager.ProcessSceneLoadedEvent: Connections { _connections.Count }");
-
-        for (int i = 0; i < _connections.Count; i++)
+        for (int i = 0; i < _lobbyPlayers.Count; i++)
         {
-            var conn = _connections[i];
+            var conn = _lobbyPlayers[i].connectionToClient;
             var player = Instantiate(_gamePlayerPrefab);
-
+           
             if (player != null)
             {
-                _gamePlayers.Add(player.GetComponent<BaseNetworkPlayer>());
-
+                NetworkServer.RemovePlayerForConnection(conn, true);
                 NetworkServer.AddPlayerForConnection(conn, player.gameObject);
 
                 player.Initialize();
                 player.Enable();
 
+                _gamePlayers.Add(player.GetComponent<IPlayer>());
+
                 SceneDataBus.SendContext(new NewClient(player));
             }
             else
             {
-                Debug.Log($"LobbyNetworkManager.ServerChangeScene: Player is null ");
+                Debug.LogError($"LobbyNetworkManager.ServerChangeScene: Player is null ");
+            }
+        }
+    }
+
+    public override void OnServerDisconnect(NetworkConnectionToClient conn)
+    {
+        TryRemovePlayer(conn);
+
+        //[TODO] Если _connections = 0, то Lobby
+
+        base.OnServerDisconnect(conn);
+    }
+
+    private void TryRemovePlayer(NetworkConnectionToClient conn)
+    {
+        if (conn.identity != null)
+        {
+            var player = conn.identity.gameObject.GetComponent<BaseNetworkPlayer>();
+
+            if (player != null)
+            {
+                _gamePlayers.Remove(player);
+
+                player.Disable();
+                player.Deactivate();
+                player.Remove();
             }
         }
     }
 
     public override void OnStopServer()
     {
-        //_roomPlayers.Clear();
-        
+        //_gamePlayers.Clear();
+
         _sceneHandler = null;
     }
 }
