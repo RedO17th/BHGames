@@ -30,11 +30,11 @@ public class CameraController : BasePlayerController, ICameraController
 
         _camera.Initialize();
 
-        RpcInitialize();
+        LocalInitialize();
     }
 
     [Client]
-    private void RpcInitialize()
+    private void LocalInitialize()
     {
         if (isLocalPlayer)
         { 
@@ -59,14 +59,12 @@ public class CameraController : BasePlayerController, ICameraController
     [Server]
     public override void Disable() => RpcDisable();
 
-    [Client]
+    [ClientRpc]
     private void RpcDisable()
     {
         if (isLocalPlayer)
         {
             enabled = false;
-
-            _camera.gameObject.SetActive(false);
         }
     }
 
@@ -106,11 +104,17 @@ public class CameraController : BasePlayerController, ICameraController
     {
         base.Deactivate();
 
-        RpcClear();
+        RpcDeactivate();
     }
 
     [ClientRpc]
-    private void RpcClear() => Clear();
+    private void RpcDeactivate()
+    {
+        _camera.gameObject.SetActive(false);
+
+        Clear();
+    }
+
     protected override void Clear()
     {
         _camera = null;

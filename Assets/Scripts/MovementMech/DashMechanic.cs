@@ -69,7 +69,6 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         }
     }
 
-
     public override void Disable() => RpcLocalDisable();
 
     [ClientRpc]
@@ -105,6 +104,8 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
     private void ProcessMechanic() => _dashRoutine = StartCoroutine(Dash());
     private IEnumerator Dash()
     {
+        CmdDisableMovementMechanic();
+
         PrepareToDash();
 
         while (CanContinue())
@@ -115,14 +116,17 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         }
 
         CompleteDash();
+
+        CmdEnableMovementMechanic();
     }
+
+    [Command]
+    private void CmdEnableMovementMechanic() => _movementMechanic.Enable();
 
     private void PrepareToDash()
     {
         _inProcess = true;
-
         CmdSetProcessState(_inProcess);
-        CmdDisableMovementMechanic();
 
         _startedDashTime = Time.time;
 
@@ -148,15 +152,10 @@ public class DashMechanic : BaseMovementMechanic, IDashMechanic
         _dashTime = 0f;
 
         _inProcess = false;
+        CmdSetProcessState(_inProcess);
 
         PlayerDataBus.SendContext(new DashContext(_player, enabled: false));
-
-        CmdSetProcessState(_inProcess);
-        CmdEnableMovementMechanic();
     }
-
-    [Command]
-    private void CmdEnableMovementMechanic() => _movementMechanic.Enable();
 
 
     public override void Deactivate()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public static class SceneDataBus
@@ -24,9 +25,12 @@ public class AddPlayer : BaseContext
 }
 public class DashAmount : BaseContext
 {
+    public string Winner { get; private set; }
     public int CollisionAmount { get; private set; }  
     public DashAmount(int amount)
     {
+        Winner = "SomePlayer";
+
         CollisionAmount = amount;
     }
 }

@@ -37,6 +37,25 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
         _gamePlayers = new List<IPlayer>();
         _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
+
+        SceneDataBus.OnContextEvent += ProcessContextEvent;
+    }
+
+    private void ProcessContextEvent(BaseContext context)
+    {
+        if (context is DashAmount daContext)
+        {
+            if (daContext.CollisionAmount == 3)
+            {
+                //Disable players
+                Debug.Log($"LobbyNetworkManager.ProcessContextEvent");
+                foreach (var player in _gamePlayers)
+                    player.Disable();
+
+                
+
+            }
+        }
     }
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
@@ -129,6 +148,8 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
     public override void OnStopServer()
     {
+        SceneDataBus.OnContextEvent -= ProcessContextEvent;
+
         //_gamePlayers.Clear();
 
         _sceneHandler = null;

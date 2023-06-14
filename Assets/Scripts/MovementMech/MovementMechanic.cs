@@ -32,6 +32,8 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
 
     private Vector3 _clientDirection = Vector3.zero;
 
+    private void Start() { }
+
     public override void Initialize(IPlayerController controller)
     {
         var movementController = controller as IMovementController;
@@ -39,7 +41,7 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         _player = movementController.Player;
 
         LocalInitialize(controller);
-    }    
+    }
 
     [Client]
     private void LocalInitialize(IPlayerController controller)
@@ -64,7 +66,10 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         }
     }
 
-    public override void Enable() => RpcLocalEnable();
+    public override void Enable()
+    {
+        RpcLocalEnable();
+    }
 
     [ClientRpc]
     private void RpcLocalEnable()
@@ -75,7 +80,10 @@ public class MovementMechanic : BaseMovementMechanic, IMovementMechanic
         }
     }
 
-    public override void Disable() => RpcLocalDisable();
+    public override void Disable()
+    {
+        RpcLocalDisable();
+    }
 
     [ClientRpc]
     private void RpcLocalDisable()

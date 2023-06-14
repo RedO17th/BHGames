@@ -177,8 +177,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   _mechanics:
-  - {fileID: 7371018394803987656}
   - {fileID: 413378143970891598}
+  - {fileID: 7371018394803987656}
 --- !u!114 &4813638428235893768
 MonoBehaviour:
   m_ObjectHideFlags: 0

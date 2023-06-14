@@ -58,16 +58,14 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
         }
     }
     
-    //Send context about DashAmount
     private void DisplayCollisionAmount()
     {
         _amountCollisions++;
 
         _uiCounter.SetAmount(_amountCollisions);
 
-        //SceneDataBus.SendContext(new DashAmount(_amountCollisions));
+        SceneDataBus.SendContext(new DashAmount(_amountCollisions));
     }
-    //..
 
     private void ProcessContextForPreviousClients(BaseContext context)
     {

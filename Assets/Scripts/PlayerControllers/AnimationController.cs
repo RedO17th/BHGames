@@ -53,23 +53,15 @@ public class AnimationController : BasePlayerController
             }
         }
     }
-    private void ProcessDashAnimation(bool enabled)
-    {
-        BaseDash(enabled);
-
-        //CmdDash(enabled);
-    }
+    private void ProcessDashAnimation(bool enabled) => BaseDash(enabled);
     private void BaseDash(bool enabled) => _animator.SetBool("Dash", enabled);
-
-    //[Command]
-    //private void CmdDash(bool enabled) => BaseDash(enabled);
     #endregion
 
     #region Move
     [ClientCallback]
     private void Update() => ProcessAnimations();
-    private void ProcessAnimations() => Move();
-    private void Move() => _animator.SetFloat("Speed", _movementController.Speed);
+    private void ProcessAnimations() => Move(_movementController.Speed);
+    private void Move(float speed) => _animator.SetFloat("Speed", speed);
     #endregion
 
     public override void Disable() => RpcLocalDisable();
@@ -81,11 +73,16 @@ public class AnimationController : BasePlayerController
         { 
             enabled = false;
 
+            Move(0f);
+            BaseDash(false);
+
             PlayerDataBus.OnContextEvent -= ProcessDashContext;            
         }
     }
 
     public override void Deactivate() => LocalDeactivate();
+
+    [ClientRpc]
     private void LocalDeactivate()
     {
         if (isLocalPlayer)
