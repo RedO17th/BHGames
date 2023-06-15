@@ -45,17 +45,40 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         if (context is DashAmount daContext)
         {
-            if (daContext.CollisionAmount == 3)
+            if (daContext.CollisionAmount == 1)
             {
-                //Disable players
                 Debug.Log($"LobbyNetworkManager.ProcessContextEvent");
-                foreach (var player in _gamePlayers)
-                    player.Disable();
 
-                
-
+                StartCoroutine(Timer());
             }
         }
+    }
+
+    private IEnumerator Timer()
+    {
+        yield return new WaitForSeconds(3f);
+
+        //Disable players
+        foreach (var player in _gamePlayers)
+            player.Disable();
+
+        //Set position
+        foreach (var player in _gamePlayers)
+        {
+            player.SetPosition(Vector3.zero);
+        }
+
+        //Reload
+        foreach (var player in _gamePlayers)
+        {
+            player.Reload();
+        }
+
+        //Enabling
+        //foreach (var player in _gamePlayers)
+        //{
+        //    player.Enable();
+        //}
     }
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
@@ -133,7 +156,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         if (conn.identity != null)
         {
-            var player = conn.identity.gameObject.GetComponent<BaseNetworkPlayer>();
+            var player = conn.identity.gameObject.GetComponent<IPlayer>();
 
             if (player != null)
             {

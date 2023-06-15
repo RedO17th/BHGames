@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,9 +14,24 @@ public class BaseCamera : MonoBehaviour, ICamera
 
     private Transform _transform = null;
 
+    private Vector3 _sourcePosition = Vector3.zero;
+    private Quaternion _sourceRotation = Quaternion.identity;
+
     public virtual void Initialize()
     {
         _transform = GetComponent<Transform>();
+
+        _sourcePosition = _transform.position;
+        _sourceRotation = _transform.rotation;
+    }
+
+    public void Reload() => RpcReload();
+
+    //[ClientRpc]
+    private void RpcReload()
+    {
+        _transform.rotation = _sourceRotation;
+        _transform.position = _sourcePosition;
     }
 
     public virtual void SetPosition(Vector3 position)
@@ -27,8 +43,7 @@ public class BaseCamera : MonoBehaviour, ICamera
         _transform.rotation = rotation;
     }
 
-    public void Destroy()
-    {
-        Destroy(gameObject, 0.5f);
-    }
+    public void Destroy() => Destroy(gameObject, 0.5f);
+
+
 }

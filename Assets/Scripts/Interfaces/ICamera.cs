@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public interface ICamera
+public interface ICamera : IReloadable
 {
     Vector3 Position { get; }
     Quaternion YRotation { get; }

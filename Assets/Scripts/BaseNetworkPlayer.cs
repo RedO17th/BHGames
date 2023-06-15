@@ -3,13 +3,18 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+public interface IReloadable
+{
+    void Reload();
+}
+
 public interface IDamagable
 {
     bool CanDamaged { get; }
     void Damage();
 }
 
-public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDamagable
+public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDamagable, IReloadable
 {
     void Initialize();
     T GetController<T>() where T : class;
@@ -30,7 +35,13 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
     public Vector3 Position
     {
         get => transform.position;
-        protected set => transform.position = value;
+        protected set => SetPositionWithoutCharController(value);
+    }
+    private void SetPositionWithoutCharController(Vector3 position)
+    {
+        _controller.enabled = false;
+        transform.position = position;
+        _controller.enabled = true;
     }
 
 
@@ -38,9 +49,28 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
 
     private Vector3 _gravity = new Vector3(0f, -9.8f, 0f);
 
-    public void SetPosition(Vector3 position) => Position = position;
-
     #region Systemic
+    public virtual void SetPosition(Vector3 position)
+    {
+        RpcSetPosition(position);
+        BaseSetPosition(position);
+    }
+
+    [ClientRpc]
+    private void RpcSetPosition(Vector3 position) => BaseSetPosition(position);
+    private void BaseSetPosition(Vector3 position) => Position = position;
+
+    public virtual void Reload()
+    {
+        foreach (var controller in _controllers)
+        {
+            if (controller is IReloadable rController)
+            {
+                rController.Reload();
+            }
+        }
+    }
+
     public virtual T GetController<T>() where T : class
     {
         T result = null;
@@ -108,7 +138,6 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
         BaseRotate(rotation);
         RpcRotate(rotation);
     }
-
     private void BaseRotate(Quaternion rotation) => transform.rotation = rotation;
 
     [ClientRpc]
@@ -120,7 +149,6 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
         BaseMove(position);
         RpcMove(position);
     }
-
     private void BaseMove(Vector3 position) => _controller.Move(position);
 
     [ClientRpc]
@@ -132,10 +160,11 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
         RpcDash(position);
         BaseDash(position);
     }
+    private void BaseDash(Vector3 position) => _controller.Move(position);
 
     [ClientRpc]
     private void RpcDash(Vector3 position) => BaseDash(position);
-    private void BaseDash(Vector3 position) => _controller.Move(position);
+
     #endregion
 
     [ServerCallback]

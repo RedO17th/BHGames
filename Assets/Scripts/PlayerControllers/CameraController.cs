@@ -9,7 +9,7 @@ public interface ICameraController
     ICamera Camera { get; }
 }
 
-public class CameraController : BasePlayerController, ICameraController
+public class CameraController : BasePlayerController, ICameraController, IReloadable
 {
     [SerializeField] private BaseCamera _camera;
 
@@ -40,6 +40,11 @@ public class CameraController : BasePlayerController, ICameraController
         { 
             _input = GetComponent<ICameraInput>();        
         }    
+    }
+
+    public void Reload()
+    {
+        _camera.Reload();
     }
 
     [Server]

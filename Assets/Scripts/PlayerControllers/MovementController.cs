@@ -69,7 +69,6 @@ public class MovementController : BasePlayerController, IMovementController
         EnableMechanics();
     }
 
-    [Server]
     private void EnableMechanics()
     {
         foreach (var mech in _mechanics)
