@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class MaterialController : BasePlayerController
+public class MaterialController : BasePlayerController, IReloadable
 {
     [SerializeField] private SkinnedMeshRenderer _renderer;
     [SerializeField] private Material _material;
@@ -17,6 +17,8 @@ public class MaterialController : BasePlayerController
     }
 
     public override void Prepare() { }
+
+    public void Reload() => SetMaterial(false);
 
     [Server]
     public override void Enable()
@@ -82,4 +84,6 @@ public class MaterialController : BasePlayerController
 
     [ClientRpc]
     private void RpcClear() => BaseClear();
+
+
 }

@@ -25,10 +25,8 @@ public class BaseCamera : MonoBehaviour, ICamera
         _sourceRotation = _transform.rotation;
     }
 
-    public void Reload() => RpcReload();
-
-    //[ClientRpc]
-    private void RpcReload()
+    [Client]
+    public void Reload()
     {
         _transform.rotation = _sourceRotation;
         _transform.position = _sourcePosition;

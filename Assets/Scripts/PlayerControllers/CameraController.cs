@@ -42,10 +42,16 @@ public class CameraController : BasePlayerController, ICameraController, IReload
         }    
     }
 
-    public void Reload()
+    public void Reload() => RpcReload();
+
+    [ClientRpc]
+    private void RpcReload()
     {
-        _camera.Reload();
-    }
+        if (isLocalPlayer)
+        {
+            _camera.Reload();
+        }
+    } 
 
     [Server]
     public override void Enable() => RpcEnable();

@@ -75,10 +75,10 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         }
 
         //Enabling
-        //foreach (var player in _gamePlayers)
-        //{
-        //    player.Enable();
-        //}
+        foreach (var player in _gamePlayers)
+        {
+            player.Enable();
+        }
     }
 
     public override void OnServerConnect(NetworkConnectionToClient conn)

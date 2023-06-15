@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface ICollisionCounterController
+public interface ICollisionCounterController : IReloadable
 {
     IPlayer Player { get; }
 }
@@ -28,6 +28,15 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
             _amountCollisions = 0;
         }
+    }
+
+    public void Reload() => ResetCounter();
+    private void ResetCounter()
+    {
+        _amountCollisions = 0;
+
+        _uiCounter.SetAmount(_amountCollisions);
+        _uiCounter.Enable();
     }
 
     [Server]
