@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public interface ILobbyNetManager
 {
@@ -47,6 +48,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         {
             if (daContext.CollisionAmount == 1)
             {
+                //[TODO] Заглушку
                 Debug.Log($"LobbyNetworkManager.ProcessContextEvent");
 
                 StartCoroutine(Timer());
@@ -87,6 +89,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         {
             var lobbyPlayer = Instantiate(_roomPlayerPrefab);
                 lobbyPlayer.transform.parent = transform;
+                lobbyPlayer.SetName(Random.Range(0, 101).ToString());
 
             _lobbyPlayers.Add(lobbyPlayer);
 
@@ -121,7 +124,9 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         for (int i = 0; i < _lobbyPlayers.Count; i++)
         {
-            var conn = _lobbyPlayers[i].connectionToClient;
+            var lPlayer = _lobbyPlayers[i];
+
+            var conn = lPlayer.Connection;
             var player = Instantiate(_gamePlayerPrefab);
            
             if (player != null)
@@ -129,6 +134,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
                 NetworkServer.RemovePlayerForConnection(conn, true);
                 NetworkServer.AddPlayerForConnection(conn, player.gameObject);
 
+                player.SetName(lPlayer.Name);
                 player.Initialize();
                 player.Enable();
 
@@ -160,6 +166,8 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
             if (player != null)
             {
+                Debug.Log($"LobbyNetworkManager.TryRemovePlayer: Player name is {player.Name} ");
+
                 _gamePlayers.Remove(player);
 
                 player.Disable();

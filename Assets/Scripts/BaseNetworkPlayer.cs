@@ -3,6 +3,12 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+public interface INamable
+{ 
+    string Name { get; }
+    void SetName(string name);
+}
+
 public interface IReloadable
 {
     void Reload();
@@ -14,7 +20,7 @@ public interface IDamagable
     void Damage();
 }
 
-public interface IPlayer : IEnabable, IDisabable, IDeactivatable, IMovable, IDamagable, IReloadable
+public interface IPlayer : INamable, IEnabable, IDisabable, IDeactivatable, IMovable, IDamagable, IReloadable
 {
     void Initialize();
     T GetController<T>() where T : class;
@@ -30,6 +36,7 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
 
     [SerializeField] private BasePlayerController[] _controllers;
 
+    public string Name { get; protected set; }
     public bool CanDamaged => _damageController.CanDamaged;
     public Vector3 Forward => transform.forward;
     public Vector3 Position
@@ -44,12 +51,21 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
         _controller.enabled = true;
     }
 
-
     private IDamageController _damageController = null;
 
     private Vector3 _gravity = new Vector3(0f, -9.8f, 0f);
 
     #region Systemic
+    public void SetName(string name)
+    {
+        RpcSetName(name);
+        BaseSetName(name);
+    }
+
+    [ClientRpc]
+    private void RpcSetName(string name) => BaseSetName(name);
+    private void BaseSetName(string name) => Name = name;
+
     public virtual void SetPosition(Vector3 position)
     {
         RpcSetPosition(position);

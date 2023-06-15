@@ -2,16 +2,19 @@ using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
-public interface ICollisionCounterController : IReloadable
+public interface IUIPlayerController : IReloadable
 {
     IPlayer Player { get; }
 }
 
-public class CollisionCounterController : BasePlayerController, ICollisionCounterController
+public class UIPlayerController : BasePlayerController, IUIPlayerController
 {
+    [SerializeField] private GameObject _canvas;
     [SerializeField] private UICollisionCounter _uiCounter;
+    [SerializeField] private TextMeshProUGUI _nameField;
 
     public IPlayer Player { get; private set; }
 
@@ -20,15 +23,26 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     public override void Initialize(IPlayer player)
     {
         if (isServerOnly)
-        { 
+        {
             Player = player;
 
             _uiCounter.Initialize(this);
             _uiCounter.SetAmount(0);
 
             _amountCollisions = 0;
+
+            BaseSetPlayerNameToUI(Player.Name);
+            RpcSetPlayerNameToUI(Player.Name);
         }
     }
+
+    private void BaseSetPlayerNameToUI(string name)
+    {
+        _nameField.text = name;
+    }
+
+    [ClientRpc]
+    private void RpcSetPlayerNameToUI(string name) => BaseSetPlayerNameToUI(name);
 
     public void Reload() => ResetCounter();
     private void ResetCounter()
@@ -43,6 +57,8 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     public override void Enable()
     {
         base.Enable();
+
+        _canvas.SetActive(true);
 
         _uiCounter.Enable();
 
@@ -83,6 +99,7 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
             if (ncContext.Client != Player)
             {
                 ShowCounter();
+                RpcSetPlayerNameToUI(Player.Name);
             }
         }
     }
@@ -97,6 +114,8 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
     public override void Disable()
     {
         base.Disable();
+
+        _canvas.SetActive(false);
 
         _uiCounter.Disable();
 
@@ -116,6 +135,8 @@ public class CollisionCounterController : BasePlayerController, ICollisionCounte
 
     protected override void Clear()
     {
+        Debug.Log($"UIPlayerController.Clear");
+
         Player = null;
 
         _amountCollisions = 0;

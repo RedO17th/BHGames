@@ -7,16 +7,16 @@ using System;
 
 public class UICollisionCounter : NetworkBehaviour, IEnabable, IDisabable
 {
-    [SerializeField] private GameObject _canvas;
+    //[SerializeField] private GameObject _canvas;
     [SerializeField] private TextMeshProUGUI _text;
 
     private ICamera _cameraTarget = null;
 
-    public void Initialize(ICollisionCounterController counter)
+    public void Initialize(IUIPlayerController counter)
     {
         _cameraTarget = GetCamera(counter);
     }
-    private ICamera GetCamera(ICollisionCounterController counter)
+    private ICamera GetCamera(IUIPlayerController counter)
     {
         return counter.Player.GetController<ICameraController>().Camera;
     }
@@ -36,28 +36,28 @@ public class UICollisionCounter : NetworkBehaviour, IEnabable, IDisabable
 
     public void Enable()
     {
-        RpcEnable();
-        BaseEnable();
+        //RpcEnable();
+        //BaseEnable();
     }
 
-    [ClientRpc]
-    private void RpcEnable()
-    {
-        BaseEnable();
+    //[ClientRpc]
+    //private void RpcEnable()
+    //{
+    //    BaseEnable();
 
-        Debug.Log($"UICollisionCounter.RpcEnable");
-    }
-    private void BaseEnable() => _canvas.SetActive(true);
+    //    Debug.Log($"UICollisionCounter.RpcEnable");
+    //}
+    //private void BaseEnable() => _canvas.SetActive(true);
 
     public void Disable()
     {
-        RpcDisable();
-        BaseDisable();
+        //RpcDisable();
+        //BaseDisable();
     }
 
-    [ClientRpc]
-    private void RpcDisable() => BaseDisable();
-    private void BaseDisable() => _canvas.SetActive(false);
+    //[ClientRpc]
+    //private void RpcDisable() => BaseDisable();
+    //private void BaseDisable() => _canvas.SetActive(false);
 
     //[ServerCallback]
     //private void Update()
