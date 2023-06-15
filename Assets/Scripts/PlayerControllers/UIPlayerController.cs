@@ -5,10 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public interface IUIPlayerController : IReloadable
-{
-    IPlayer Player { get; }
-}
+public interface IUIPlayerController : IReloadable { }
 
 public class UIPlayerController : BasePlayerController, IUIPlayerController
 {
@@ -16,7 +13,7 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     [SerializeField] private UICollisionCounter _uiCounter;
     [SerializeField] private TextMeshProUGUI _nameField;
 
-    public IPlayer Player { get; private set; }
+    private IPlayer _player = null;
 
     private int _amountCollisions = 0;
 
@@ -24,33 +21,39 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     {
         if (isServerOnly)
         {
-            Player = player;
+            _player = player;
 
-            _uiCounter.Initialize(this);
-            _uiCounter.SetAmount(0);
+            RpcSetCollisionAmount(0);
+            BaseSetCollisionAmount(0);
 
             _amountCollisions = 0;
 
-            BaseSetPlayerNameToUI(Player.Name);
-            RpcSetPlayerNameToUI(Player.Name);
+            RpcSetPlayerNameToUI(_player.Name);
+            BaseSetPlayerNameToUI(_player.Name);
         }
     }
 
+    [ClientRpc]
+    private void RpcSetCollisionAmount(int amount) => BaseSetCollisionAmount(amount);
+    private void BaseSetCollisionAmount(int amount) => _uiCounter.SetAmount(amount);
+
+    [ClientRpc]
+    private void RpcSetPlayerNameToUI(string name) => BaseSetPlayerNameToUI(name);
     private void BaseSetPlayerNameToUI(string name)
     {
         _nameField.text = name;
     }
-
-    [ClientRpc]
-    private void RpcSetPlayerNameToUI(string name) => BaseSetPlayerNameToUI(name);
 
     public void Reload() => ResetCounter();
     private void ResetCounter()
     {
         _amountCollisions = 0;
 
-        _uiCounter.SetAmount(_amountCollisions);
-        _uiCounter.Enable();
+        RpcSetCollisionAmount(_amountCollisions);
+        BaseSetCollisionAmount(_amountCollisions);
+
+        EnableUI();
+        RpcEnableUI();
     }
 
     [Server]
@@ -58,13 +61,17 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     {
         base.Enable();
 
-        _canvas.SetActive(true);
-
-        _uiCounter.Enable();
+        EnableUI();
+        RpcEnableUI();
 
         SceneDataBus.OnContextEvent += ProcessContext;
         PlayerDataBus.OnContextEvent += ProcessContext;
     }
+
+    private void EnableUI() => _canvas.SetActive(true);
+
+    [ClientRpc]
+    private void RpcEnableUI() => EnableUI();
 
     private void ProcessContext(BaseContext context)
     {
@@ -76,18 +83,18 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     {
         if (context is CollisionContext ceContext)
         {
-            if (ceContext.Player == Player)
+            if (ceContext.Player == _player)
             {
                 DisplayCollisionAmount();
             }
         }
     }
-    
     private void DisplayCollisionAmount()
     {
         _amountCollisions++;
 
-        _uiCounter.SetAmount(_amountCollisions);
+        RpcSetCollisionAmount(_amountCollisions);
+        BaseSetCollisionAmount(_amountCollisions);
 
         SceneDataBus.SendContext(new DashAmount(_amountCollisions));
     }
@@ -96,39 +103,60 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     {
         if (context is NewClient ncContext)
         {
-            if (ncContext.Client != Player)
+            if (ncContext.Client != _player)
             {
-                ShowCounter();
-                RpcSetPlayerNameToUI(Player.Name);
+                ShowUI();
+                RpcSetPlayerNameToUI(_player.Name);
             }
         }
     }
-    private void ShowCounter()
+    private void ShowUI()
     {
-        _uiCounter.SetAmount(_amountCollisions);
-        _uiCounter.Enable();
+        RpcSetCollisionAmount(_amountCollisions);
+        BaseSetCollisionAmount(_amountCollisions);
+
+        EnableUI();
+        RpcEnableUI();
     }
 
+    [ServerCallback]
+    private void Update()
+    {
+        //if (_cameraTarget != null)
+        //{
+        //    //RpcLookAtTarget(_cameraTarget.Position);
+        //    LookAtTarget(_cameraTarget.Position);
+        //}
+    }
+
+    //[ClientRpc]
+    //private void RpcLookAtTarget(Vector3 position) => LookAtTarget(position);
+    //private void LookAtTarget(Vector3 position) => transform.LookAt(position);
 
     [Server]
     public override void Disable()
     {
         base.Disable();
 
-        _canvas.SetActive(false);
-
-        _uiCounter.Disable();
+        DisableUI();
+        RpcDisableUI();
 
         SceneDataBus.OnContextEvent -= ProcessContext;
         PlayerDataBus.OnContextEvent -= ProcessContext;
     }
+    private void DisableUI() => _canvas.SetActive(false);
+
+    [ClientRpc]
+    private void RpcDisableUI() => DisableUI();
 
     [Server]
     public override void Deactivate()
     {
-        _uiCounter.SetAmount(0);
-        _uiCounter.Disable();
-        _uiCounter.Clear();
+        RpcSetCollisionAmount(0);
+        BaseSetCollisionAmount(0);
+
+        DisableUI();
+        RpcDisableUI();
 
         base.Deactivate();
     }
@@ -137,7 +165,7 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     {
         Debug.Log($"UIPlayerController.Clear");
 
-        Player = null;
+        _player = null;
 
         _amountCollisions = 0;
     }

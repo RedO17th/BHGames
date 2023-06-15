@@ -46,7 +46,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         if (context is DashAmount daContext)
         {
-            if (daContext.CollisionAmount == 1)
+            if (daContext.CollisionAmount == 3)
             {
                 //[TODO] Заглушку
                 Debug.Log($"LobbyNetworkManager.ProcessContextEvent");

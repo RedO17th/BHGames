@@ -62,7 +62,7 @@ public class BaseNetworkPlayer : NetworkBehaviour, IPlayer
         BaseSetName(name);
     }
 
-    [ClientRpc]
+    [ClientRpc] //Нужно ли теперь?
     private void RpcSetName(string name) => BaseSetName(name);
     private void BaseSetName(string name) => Name = name;
 
