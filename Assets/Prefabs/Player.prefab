@@ -489,6 +489,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5352817985325361172, guid: 588378cf607899d419b2712ef6549e9b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 5395888930469335077, guid: 588378cf607899d419b2712ef6549e9b, type: 3}
       propertyPath: m_Camera
       value: 

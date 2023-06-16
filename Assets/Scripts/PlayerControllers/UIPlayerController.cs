@@ -13,9 +13,10 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     [SerializeField] private UICollisionCounter _uiCounter;
     [SerializeField] private TextMeshProUGUI _nameField;
 
-    private IPlayer _player = null;
+    private IDashCollisionController _dashController = null;
 
-    private int _amountCollisions = 0;
+    private IPlayer _player = null;
+    private ICamera _targetCamera = null;
 
     public override void Initialize(IPlayer player)
     {
@@ -23,14 +24,21 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
         {
             _player = player;
 
+            _dashController = _player.GetController<IDashCollisionController>();
+
+            GetPlayerCamera();
+
             RpcSetCollisionAmount(0);
             BaseSetCollisionAmount(0);
-
-            _amountCollisions = 0;
 
             RpcSetPlayerNameToUI(_player.Name);
             BaseSetPlayerNameToUI(_player.Name);
         }
+    }
+
+    private void GetPlayerCamera()
+    {
+        _targetCamera = _player.GetController<ICameraController>().Camera;
     }
 
     [ClientRpc]
@@ -47,10 +55,8 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
     public void Reload() => ResetCounter();
     private void ResetCounter()
     {
-        _amountCollisions = 0;
-
-        RpcSetCollisionAmount(_amountCollisions);
-        BaseSetCollisionAmount(_amountCollisions);
+        RpcSetCollisionAmount(0);
+        BaseSetCollisionAmount(0);
 
         EnableUI();
         RpcEnableUI();
@@ -81,22 +87,18 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
 
     private void ProcessCollisionContext(BaseContext context)
     {
-        if (context is CollisionContext ceContext)
+        if (context is DashCollision dcContext)
         {
-            if (ceContext.Player == _player)
+            if (dcContext.Player == _player)
             {
-                DisplayCollisionAmount();
+                DisplayCollisionAmount(dcContext.Amount);
             }
         }
     }
-    private void DisplayCollisionAmount()
+    private void DisplayCollisionAmount(int amountCollisions)
     {
-        _amountCollisions++;
-
-        RpcSetCollisionAmount(_amountCollisions);
-        BaseSetCollisionAmount(_amountCollisions);
-
-        SceneDataBus.SendContext(new DashAmount(_amountCollisions));
+        RpcSetCollisionAmount(amountCollisions);
+        BaseSetCollisionAmount(amountCollisions);
     }
 
     private void ProcessContextForPreviousClients(BaseContext context)
@@ -105,33 +107,32 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
         {
             if (ncContext.Client != _player)
             {
-                ShowUI();
+                ShowUI(_dashController.DashAmount);
                 RpcSetPlayerNameToUI(_player.Name);
             }
         }
     }
-    private void ShowUI()
+    private void ShowUI(int amountCollisions)
     {
-        RpcSetCollisionAmount(_amountCollisions);
-        BaseSetCollisionAmount(_amountCollisions);
+        RpcSetCollisionAmount(amountCollisions);
+        BaseSetCollisionAmount(amountCollisions);
 
         EnableUI();
         RpcEnableUI();
     }
 
     [ServerCallback]
-    private void Update()
+    private void Update() => ProcessLookAtCameraMechanic();
+    private void ProcessLookAtCameraMechanic()
     {
-        //if (_cameraTarget != null)
-        //{
-        //    //RpcLookAtTarget(_cameraTarget.Position);
-        //    LookAtTarget(_cameraTarget.Position);
-        //}
+        if (_targetCamera != null)
+        {
+            RpcLookAtCamera(_targetCamera.Position);
+        }
     }
 
-    //[ClientRpc]
-    //private void RpcLookAtTarget(Vector3 position) => LookAtTarget(position);
-    //private void LookAtTarget(Vector3 position) => transform.LookAt(position);
+    [ClientRpc]
+    private void RpcLookAtCamera(Vector3 position) => _canvas.transform.LookAt(position);
 
     [Server]
     public override void Disable()
@@ -163,10 +164,7 @@ public class UIPlayerController : BasePlayerController, IUIPlayerController
 
     protected override void Clear()
     {
-        Debug.Log($"UIPlayerController.Clear");
-
         _player = null;
-
-        _amountCollisions = 0;
+        _targetCamera = null;
     }
 }

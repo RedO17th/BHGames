@@ -4,24 +4,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public interface IDashCollisionController { }
+public interface IDashCollisionController : IReloadable
+{
+    int DashAmount { get; }
+}
 
 public class DashCollisionController : BasePlayerController, IDashCollisionController
 {
     [SerializeField] private Collider _trigger = null;
 
+    public int DashAmount => _dashAmount;
+
     private IPlayer _player = null;
     private IDashMechanic _dashMechanic = null;
+
+    private int _dashAmount = 0;
 
     public override void Initialize(IPlayer player)
     {
         _player = player;
         _dashMechanic = GetDashMechanic();
     }
-
     private IDashMechanic GetDashMechanic()
     { 
         return _player.GetController<IMovementController>().GetMechanic<IDashMechanic>();
+    }
+
+    public void Reload() => ResetCounter();
+    private void ResetCounter()
+    {
+        _dashAmount = 0;
     }
 
     [Server]
@@ -64,13 +76,19 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
         {
             if (enemy.CanDamaged && _dashMechanic.InProcess)
             {
+                _dashAmount++;
+
                 enemy.Damage();
 
-                ProcessCollisionWithEnemyContext();
+                ProcessDashCollisionContext();
             }
         }
     }
-    private void ProcessCollisionWithEnemyContext() => PlayerDataBus.SendContext(new CollisionContext(_player));
+    private void ProcessDashCollisionContext()
+    {
+        PlayerDataBus.SendContext(new DashCollision(_player, _dashAmount));
+        SceneDataBus.SendContext(new DashAmount(_player.Name, _dashAmount));
+    }
     #endregion
 
     [Server]
@@ -91,6 +109,8 @@ public class DashCollisionController : BasePlayerController, IDashCollisionContr
 
     private void BaseClear()
     {
+        _dashAmount = 0;
+
         _dashMechanic = null;
         _player = null;
     }

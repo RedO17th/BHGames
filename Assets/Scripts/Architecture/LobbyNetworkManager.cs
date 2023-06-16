@@ -19,6 +19,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
     [Header("Settings")]
     [SerializeField] private int _minPlayers = 2;
+    [SerializeField] private int _amountToWin = 1;
 
     [Header("Room player")]
     [SerializeField] private BaseNetworkLobbyPlayer _roomPlayerPrefab = null;
@@ -46,7 +47,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         if (context is DashAmount daContext)
         {
-            if (daContext.CollisionAmount == 3)
+            if (daContext.CollisionAmount == _amountToWin)
             {
                 //[TODO] Заглушку
                 Debug.Log($"LobbyNetworkManager.ProcessContextEvent");

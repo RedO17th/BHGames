@@ -107,9 +107,13 @@ public class CameraController : BasePlayerController, ICameraController, IReload
     {
         if (isLocalPlayer)
         {
-            _camera.SetPosition(_cameraOffset + _player.Position);
+            CmdSetCameraPosition(_cameraOffset + _player.Position);
+            BaseSetCameraPosition(_cameraOffset + _player.Position);
         }
     }
+    [Command]
+    private void CmdSetCameraPosition(Vector3 position) => BaseSetCameraPosition(position);
+    private void BaseSetCameraPosition(Vector3 position) => _camera.SetPosition(position);
 
     public override void Deactivate()
     {

@@ -27,9 +27,9 @@ public class DashAmount : BaseContext
 {
     public string Winner { get; private set; }
     public int CollisionAmount { get; private set; }  
-    public DashAmount(int amount)
+    public DashAmount(string name, int amount)
     {
-        Winner = "SomePlayer";
+        Winner = name;
 
         CollisionAmount = amount;
     }
@@ -55,12 +55,14 @@ public static class PlayerDataBus
 }
 
 //BasePlayerContext ???
-public class CollisionContext : BaseContext
+public class DashCollision : BaseContext
 {
     public IPlayer Player { get; private set; }
-    public CollisionContext(IPlayer player)
+    public int Amount { get; private set; }
+    public DashCollision(IPlayer player, int amount)
     {
         Player = player;
+        Amount = amount;
     }
 }
 
