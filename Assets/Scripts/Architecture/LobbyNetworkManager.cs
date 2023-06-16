@@ -9,11 +9,16 @@ using Random = UnityEngine.Random;
 
 public interface ILobbyNetManager
 {
+    bool IsServerEnabled { get; }
+
     void ServerChangeScene(string newSceneName);
 }
 
 public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 {
+    [Header("Network subsystems")]
+    [SerializeField] private BaseNetworkSubSystem[] _subSystems;
+
     [Header("Map set")]
     [SerializeField] private MapSet _mapSet;
 
@@ -27,6 +32,8 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     [Header("Game player")]
     [SerializeField] private BaseNetworkPlayer _gamePlayerPrefab = null;
 
+    public bool IsServerEnabled { get; private set; }
+
     //TODO - Позаботиться о списках
     private List<IPlayer> _gamePlayers;
     public List<BaseNetworkLobbyPlayer> _lobbyPlayers;
@@ -35,12 +42,25 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
     public override void OnStartServer()
     {
+        IsServerEnabled = true;
+        Debug.Log($"LobbyNetworkManager.OnStartServer");
+
         _sceneHandler = new SceneHandler(this, _mapSet);
 
         _gamePlayers = new List<IPlayer>();
         _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
 
         SceneDataBus.OnContextEvent += ProcessContextEvent;
+
+        InitializeSubSystems();
+    }
+
+    private void InitializeSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.Initialize(this);
+        }
     }
 
     private void ProcessContextEvent(BaseContext context)
@@ -89,7 +109,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         if (_sceneHandler.CanAddNewPlayer())
         {
             var lobbyPlayer = Instantiate(_roomPlayerPrefab);
-                lobbyPlayer.transform.parent = transform;
+                lobbyPlayer.SetParent(transform);
                 lobbyPlayer.SetName(Random.Range(0, 101).ToString());
 
             _lobbyPlayers.Add(lobbyPlayer);
@@ -154,9 +174,9 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         TryRemovePlayer(conn);
 
-        //[TODO] Если _connections = 0, то Lobby
-
         base.OnServerDisconnect(conn);
+
+        //[TODO] Если _connections = 0, то Lobby
     }
 
     private void TryRemovePlayer(NetworkConnectionToClient conn)
@@ -185,5 +205,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         //_gamePlayers.Clear();
 
         _sceneHandler = null;
+
+        IsServerEnabled = false;
     }
 }

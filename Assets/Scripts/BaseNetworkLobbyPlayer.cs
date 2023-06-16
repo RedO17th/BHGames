@@ -7,6 +7,8 @@ public interface ILobbyPlayer : INamable
 {
     NetworkConnectionToClient Connection { get; }
     bool IsReady { get; }
+
+    void SetParent(Transform parent);
 }
 public class BaseNetworkLobbyPlayer : NetworkBehaviour, ILobbyPlayer
 {
@@ -17,5 +19,10 @@ public class BaseNetworkLobbyPlayer : NetworkBehaviour, ILobbyPlayer
     public void SetName(string name)
     {
         Name = name;
+    }
+
+    public void SetParent(Transform parent)
+    {
+        transform.parent = parent;
     }
 }
