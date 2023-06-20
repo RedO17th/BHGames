@@ -12,7 +12,7 @@ public class BaseServerPanel : MonoBehaviour
     [SerializeField] private TMP_InputField _adress;
     [SerializeField] private Button _runBtn;
 
-    public event Action<string> OnServerRun;
+    public event Action<string> OnStartBynetAdress;
 
     public void Enable()
     {
@@ -24,7 +24,7 @@ public class BaseServerPanel : MonoBehaviour
     private void ProcessConnectionToserver()
     {
         if(_adress.text != string.Empty)
-            OnServerRun.Invoke(_adress.text);
+            OnStartBynetAdress.Invoke(_adress.text);
     }
 
     public void Disable()

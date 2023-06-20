@@ -9,13 +9,14 @@ using Random = UnityEngine.Random;
 
 public interface ILobbyNetManager
 {
-    bool IsServerEnabled { get; }
+    bool IsServer { get; }
 
     void ServerChangeScene(string newSceneName);
 }
 
 public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 {
+    [SerializeField] private bool _isServer = true;
     [Header("Network subsystems")]
     [SerializeField] private BaseNetworkSubSystem[] _subSystems;
 
@@ -32,7 +33,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     [Header("Game player")]
     [SerializeField] private BaseNetworkPlayer _gamePlayerPrefab = null;
 
-    public bool IsServerEnabled { get; private set; }
+    public bool IsServer => _isServer;
 
     //TODO - Позаботиться о списках
     private List<IPlayer> _gamePlayers;
@@ -42,7 +43,6 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
     public override void OnStartServer()
     {
-        IsServerEnabled = true;
         Debug.Log($"LobbyNetworkManager.OnStartServer");
 
         _sceneHandler = new SceneHandler(this, _mapSet);
@@ -104,7 +104,8 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         }
     }
 
-    public override void OnServerConnect(NetworkConnectionToClient conn)
+    public override void OnServerConnect(NetworkConnectionToClient conn) { }
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         if (_sceneHandler.CanAddNewPlayer())
         {
@@ -205,7 +206,5 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         //_gamePlayers.Clear();
 
         _sceneHandler = null;
-
-        IsServerEnabled = false;
     }
 }

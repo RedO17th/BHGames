@@ -17,11 +17,10 @@ public class ClientLoggin
 
 public class BaseClientPanel : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField _playerName;
     [SerializeField] private TMP_InputField _adress;
     [SerializeField] private Button _connectBtn;
 
-    public event Action<ClientLoggin> OnClientConnect;
+    public event Action<string> OnStartBynetAdress;
 
     public void Enable()
     {
@@ -32,13 +31,8 @@ public class BaseClientPanel : MonoBehaviour
 
     private void ProcessConnectionToserver()
     {
-        var adress = _adress.text;
-        var name = _playerName.text;
-
-        if (adress != string.Empty && name != string.Empty)
-        {
-            OnClientConnect.Invoke(new ClientLoggin(adress, name));
-        }
+        if (_adress.text != string.Empty)
+            OnStartBynetAdress.Invoke(_adress.text);
     }
 
     public void Disable()
