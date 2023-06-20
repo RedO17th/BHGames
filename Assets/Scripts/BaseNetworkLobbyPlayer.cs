@@ -10,6 +10,7 @@ public interface ILobbyPlayer : INamable
 
     void SetParent(Transform parent);
 }
+
 public class BaseNetworkLobbyPlayer : NetworkBehaviour, ILobbyPlayer
 {
     public NetworkConnectionToClient Connection => connectionToClient;

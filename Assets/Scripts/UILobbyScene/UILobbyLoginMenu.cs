@@ -7,8 +7,8 @@ public class UILobbyLoginMenu : MonoBehaviour
     [SerializeField] private LobbyNetworkManager _networkManager;
 
     //Привести к массиву
-    [SerializeField] private BaseServerPanel _serverPanel;
-    [SerializeField] private BaseClientPanel _clientPanel;
+    [SerializeField] private BaseServerMenu _serverPanel;
+    [SerializeField] private BaseClientMenu _clientPanel;
 
     private void OnEnable() => DefinePanelByRole();
     private void DefinePanelByRole()

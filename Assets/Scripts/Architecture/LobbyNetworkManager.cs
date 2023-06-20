@@ -16,8 +16,11 @@ public interface ILobbyNetManager
 
 public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 {
+    [Header("Server settings")]
     [SerializeField] private bool _isServer = true;
+
     [Header("Network subsystems")]
+    [SerializeField] private UINetworkMenu _networkMenu = null;
     [SerializeField] private BaseNetworkSubSystem[] _subSystems;
 
     [Header("Map set")]
@@ -36,7 +39,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     public bool IsServer => _isServer;
 
     //TODO - Позаботиться о списках
-    private List<IPlayer> _gamePlayers;
+    public List<BaseNetworkPlayer> _gamePlayers;
     public List<BaseNetworkLobbyPlayer> _lobbyPlayers;
 
     private ISceneHandler _sceneHandler = null;
@@ -47,20 +50,33 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
         _sceneHandler = new SceneHandler(this, _mapSet);
 
-        _gamePlayers = new List<IPlayer>();
+        _gamePlayers = new List<BaseNetworkPlayer>();
         _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
 
         SceneDataBus.OnContextEvent += ProcessContextEvent;
-
-        InitializeSubSystems();
     }
 
-    private void InitializeSubSystems()
+    public override void OnStopServer()
     {
-        foreach (var system in _subSystems)
+        SceneDataBus.OnContextEvent -= ProcessContextEvent;
+
+        _sceneHandler = null;
+    }
+
+    public override void OnStartClient()
+    {
+        if (_networkMenu != null)
         {
-            system.Initialize(this);
+            Debug.Log($"LobbyNetworkManager.OnStartClient");
+
+            _networkMenu.Enable();
+            _networkMenu.StartClient();
         }
+    }
+    public override void OnStopClient()
+    {
+        _networkMenu.Disable();
+        _networkMenu.StopClient();
     }
 
     private void ProcessContextEvent(BaseContext context)
@@ -104,9 +120,15 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         }
     }
 
-    public override void OnServerConnect(NetworkConnectionToClient conn) { }
+    public override void OnServerConnect(NetworkConnectionToClient conn)
+    {
+        Debug.Log($"LobbyNetworkManager.OnServerConnect");
+    }
+
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
+        Debug.Log($"LobbyNetworkManager.OnServerAddPlayer");
+
         if (_sceneHandler.CanAddNewPlayer())
         {
             var lobbyPlayer = Instantiate(_roomPlayerPrefab);
@@ -160,7 +182,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
                 player.Initialize();
                 player.Enable();
 
-                _gamePlayers.Add(player.GetComponent<IPlayer>());
+                _gamePlayers.Add(player.GetComponent<BaseNetworkPlayer>());
 
                 SceneDataBus.SendContext(new NewClient(player));
             }
@@ -184,7 +206,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         if (conn.identity != null)
         {
-            var player = conn.identity.gameObject.GetComponent<IPlayer>();
+            var player = conn.identity.gameObject.GetComponent<BaseNetworkPlayer>();
 
             if (player != null)
             {
@@ -197,14 +219,5 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
                 player.Remove();
             }
         }
-    }
-
-    public override void OnStopServer()
-    {
-        SceneDataBus.OnContextEvent -= ProcessContextEvent;
-
-        //_gamePlayers.Clear();
-
-        _sceneHandler = null;
     }
 }
