@@ -2,17 +2,41 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using static UnityEditor.Progress;
 
-public interface IUINetworkPlayerInfo : INamable
+public interface IUINetworkPlayerInfo
 {
-    NetworkIdentity Identity { get; }
+    //NetworkIdentity Identity { get; }
+    string Name { get; }
 }
 
-public class UINetworkPlayerInfo : NetworkBehaviour, IUINetworkPlayerInfo
+public class UINetworkPlayerInfo : IUINetworkPlayerInfo
 {
-    public NetworkIdentity Identity => netIdentity;
+    //public NetworkIdentity Identity { get; private set; }
     public string Name { get; private set; }
 
+    //public UINetworkPlayerInfo(NetworkIdentity identity, string name)
+    public UINetworkPlayerInfo(string name)
+    {
+        //Identity = identity;
+        Name = name;
+    }
+}
 
-    public void SetName(string name) => Name = name;
+public static class UINetworkPlayerInfoSerializer
+{
+    public static void WritePlayerInfo(this NetworkWriter writer, UINetworkPlayerInfo info)
+    {
+        //writer.WriteNetworkIdentity(info.Identity);
+        writer.WriteString(info.Name);
+    }
+
+    public static UINetworkPlayerInfo ReadPlayerInfo(this NetworkReader reader)
+    {
+        //var identity = reader.ReadNetworkIdentity();
+        var name = reader.ReadString();
+
+        //return new UINetworkPlayerInfo(identity, name);
+        return new UINetworkPlayerInfo(name);
+    }
 }

@@ -13,12 +13,19 @@ public class UINetworkMenu : NetworkBehaviour, IUINetworkMenu
 {
     [SerializeField] private UINetworkClientMenu _clientMenu;
 
-    [SerializeField] private UINetworkPlayerInfo _playerInfoPrefab;
+    [Server]
+    public void Enable()
+    {
+        RpcEnable();
+        BaseEnable();
+    }
 
-    public void Enable() => gameObject.SetActive(true);
+    [ClientRpc]
+    private void RpcEnable() => BaseEnable();
+    private void BaseEnable() => gameObject.SetActive(true);
+
     public void Disable() => gameObject.SetActive(false);
 
-    public List<UINetworkPlayerInfo> _playerInfos = new List<UINetworkPlayerInfo>();
 
     [Client]
     public void StartClient()
@@ -40,24 +47,23 @@ public class UINetworkMenu : NetworkBehaviour, IUINetworkMenu
     {
         Debug.Log($"UINetworkMenu.ProcessOnAddClientInfoEvent: Name is {obj}");
 
-        //Создавать на сервере
-        var player = Instantiate(_playerInfoPrefab);
-            player.name = obj;
+        var info = new UINetworkPlayerInfo(obj);
 
-        _playerInfos.Add(player);
+        var writer = new NetworkWriter();
+            writer.WritePlayerInfo(info);
 
-        SendPlayerInfoToServer(player.Identity);
+        var data = writer.ToArray();
+
+        CmdItem(data);
     }
 
     [Command(requiresAuthority = false)]
-    private void SendPlayerInfoToServer(NetworkIdentity identity)
+    private void CmdItem(byte[] info)
     {
-        var player = identity.gameObject.GetComponent<IUINetworkPlayerInfo>();
+        var reader = new NetworkReader(info);
+        var item = reader.ReadPlayerInfo();
 
-        if (player != null)
-        {
-            Debug.Log($"Server: UINetworkMenu.SendPlayerInfoToServer: Name is { player.Name }");
-        }
+        Debug.Log($"UINetworkMenu.CmdItem");
     }
 
     //Server

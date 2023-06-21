@@ -35,6 +35,7 @@ public class DashAmount : BaseContext
     }
 }
 
+#region Network
 public class NewClient : BaseContext
 {
     public IPlayer Client { get; private set; }
@@ -43,6 +44,15 @@ public class NewClient : BaseContext
         Client = client;
     }
 }
+
+public class AddLobbyPlayer : BaseContext
+{
+    public AddLobbyPlayer()
+    {
+
+    }
+}
+#endregion
 
 public static class PlayerDataBus
 {
@@ -90,3 +100,4 @@ public class DamageContext : BaseContext
         Begin = begin;
     }
 }
+

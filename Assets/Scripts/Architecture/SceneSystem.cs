@@ -37,7 +37,7 @@ public abstract class BaseSceneSystem : NetworkManager, ISceneSystem
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        base.OnServerAddPlayer(conn);
+        //base.OnServerAddPlayer(conn);
 
         var player = conn?.identity?.gameObject.GetComponent<IPlayer>();
 

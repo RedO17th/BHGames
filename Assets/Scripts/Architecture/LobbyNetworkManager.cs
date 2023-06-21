@@ -20,7 +20,6 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     [SerializeField] private bool _isServer = true;
 
     [Header("Network subsystems")]
-    [SerializeField] private UINetworkMenu _networkMenu = null;
     [SerializeField] private BaseNetworkSubSystem[] _subSystems;
 
     [Header("Map set")]
@@ -53,7 +52,26 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         _gamePlayers = new List<BaseNetworkPlayer>();
         _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
 
+        InitializeSubSystems();
+        PrepareSubSystems();
+
         SceneDataBus.OnContextEvent += ProcessContextEvent;
+    }
+
+    private void InitializeSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.Initialize(this);
+        }
+    }
+
+    private void PrepareSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.Prepare();
+        }
     }
 
     public override void OnStopServer()
@@ -62,21 +80,27 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
         _sceneHandler = null;
     }
-
-    public override void OnStartClient()
+    public override void OnServerConnect(NetworkConnectionToClient conn)
     {
-        if (_networkMenu != null)
-        {
-            Debug.Log($"LobbyNetworkManager.OnStartClient");
-
-            _networkMenu.Enable();
-            _networkMenu.StartClient();
-        }
+        Debug.Log($"LobbyNetworkManager.OnServerConnect");
     }
-    public override void OnStopClient()
+
+    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        _networkMenu.Disable();
-        _networkMenu.StopClient();
+        Debug.Log($"LobbyNetworkManager.OnServerAddPlayer");
+
+        if (_sceneHandler.CanAddNewPlayer())
+        {
+            var lobbyPlayer = Instantiate(_roomPlayerPrefab);
+                lobbyPlayer.SetParent(transform);
+                lobbyPlayer.SetName(Random.Range(0, 101).ToString());
+
+            _lobbyPlayers.Add(lobbyPlayer);
+
+            NetworkServer.AddPlayerForConnection(conn, lobbyPlayer.gameObject);
+
+            SceneDataBus.SendContext(new AddLobbyPlayer());
+        }
     }
 
     private void ProcessContextEvent(BaseContext context)
@@ -117,27 +141,6 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         foreach (var player in _gamePlayers)
         {
             player.Enable();
-        }
-    }
-
-    public override void OnServerConnect(NetworkConnectionToClient conn)
-    {
-        Debug.Log($"LobbyNetworkManager.OnServerConnect");
-    }
-
-    public override void OnServerAddPlayer(NetworkConnectionToClient conn)
-    {
-        Debug.Log($"LobbyNetworkManager.OnServerAddPlayer");
-
-        if (_sceneHandler.CanAddNewPlayer())
-        {
-            var lobbyPlayer = Instantiate(_roomPlayerPrefab);
-                lobbyPlayer.SetParent(transform);
-                lobbyPlayer.SetName(Random.Range(0, 101).ToString());
-
-            _lobbyPlayers.Add(lobbyPlayer);
-
-            NetworkServer.AddPlayerForConnection(conn, lobbyPlayer.gameObject);
         }
     }
 

@@ -14,7 +14,7 @@ public class UILobbyLoginMenu : MonoBehaviour
     private void DefinePanelByRole()
     {
         Action definer = _networkManager.IsServer ? DefineLikeServer : DefineLikeClient;
-               definer.Invoke();  
+        definer.Invoke();
     }
 
     private void DefineLikeServer()

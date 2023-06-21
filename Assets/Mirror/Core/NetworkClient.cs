@@ -1084,6 +1084,7 @@ namespace Mirror
             if (identity == null)
             {
                 Debug.LogError($"Could not spawn assetId={message.assetId} scene={message.sceneId:X} netId={message.netId}");
+
                 return false;
             }
 
