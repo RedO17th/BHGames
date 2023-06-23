@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UISubSystem : BaseNetworkSubSystem
 {
-    [SerializeField] private UILobbyController _networkMenu = null;
+    [SerializeField] private UILobbyController _lobbyController = null;
 
     private LobbyNetworkManager _lobbyManager = null;
 
@@ -15,28 +15,50 @@ public class UISubSystem : BaseNetworkSubSystem
         _lobbyManager = lobbyManager as LobbyNetworkManager;
     }
 
-    public override void Prepare() 
+    public override void SubScribe() 
     {
         SceneDataBus.OnContextEvent += ProcessContext;
     }
 
     private void ProcessContext(BaseContext cntxt)
     {
-        if (cntxt is AddLobbyPlayer context)
+        if (cntxt is AddLobbyPlayer apContext)
         {
-            TRpcEnableUIMenuByRole(context.Player.Connection);
+            TRpcEnableUIByClientRole(apContext.Player.Connection);
+        }
+
+        if (cntxt is ServerLoaded slContext)
+        {
+            EnableUIByServerRole();
         }
     }
 
     [TargetRpc]
-    private void TRpcEnableUIMenuByRole(NetworkConnectionToClient connection)
+    private void TRpcEnableUIByClientRole(NetworkConnectionToClient connection)
     {
-        //Где включать данный контроллер... При включении нужного состояния.
-        _networkMenu.Enable();
-        _networkMenu.StartClient();
+        _lobbyController.ShowClientUI();
     }
 
-    public override void Stop() { }
+    private void EnableUIByServerRole()
+    {
+        _lobbyController.ShowServerUI();
+    }
+
+    public override void StartSystem() 
+    {
+        //Где включать данный контроллер... При включении нужного состояния.
+        _lobbyController.Enable();
+    }
+
+    public override void StopSystem()
+    {
+        _lobbyController.Disable();
+    }
+
+    public override void UnSubScribe()
+    {
+        SceneDataBus.OnContextEvent -= ProcessContext;
+    }
 
     public override void Clear()
     {

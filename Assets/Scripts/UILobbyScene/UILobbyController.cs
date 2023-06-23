@@ -5,11 +5,11 @@ using UnityEngine;
 
 public interface IUILobbyController : IEnabable, IDisabable
 {
-    void StartClient();
-    void StopClient();
+    void ShowClientUI();
+    void HideClientUI();
 
-    void StartServer();
-    void StopServer();
+    void ShowServerUI();
+    void HideServerUI();
 }
 
 public class UILobbyController : NetworkBehaviour, IUILobbyController
@@ -17,31 +17,42 @@ public class UILobbyController : NetworkBehaviour, IUILobbyController
     [SerializeField] private UILobbyServerMenu _serverMenu;
     [SerializeField] private UILobbyClientMenu _clientMenu;
 
-    [Client]
+    [Server]
     public void Enable()
+    {
+        //RpcEnable();
+        BaseEnable();
+    }
+
+    [ClientRpc]
+    private void RpcEnable()
     {
         BaseEnable();
     }
     private void BaseEnable() => gameObject.SetActive(true);
 
-    [Client]
+    [Server]
     public void Disable()
     {
+        //RpcDisable();
         BaseDisable();
     }
+    
+    [ClientRpc]
+    private void RpcDisable() => BaseDisable();
     private void BaseDisable() => gameObject.SetActive(true);
 
     #region Client
 
     [Client]
-    public void StartClient()
+    public void ShowClientUI()
     {
         _clientMenu.OnAddClientInfo += ProcessOnAddClientInfoEvent;
         _clientMenu.Enable();
     }
 
     [Client]
-    public void StopClient()
+    public void HideClientUI()
     {
         _clientMenu.OnAddClientInfo -= ProcessOnAddClientInfoEvent;
         _clientMenu.Disable();
@@ -49,7 +60,7 @@ public class UILobbyController : NetworkBehaviour, IUILobbyController
 
     private void ProcessOnAddClientInfoEvent(string obj)
     {
-        var info = new UINetworkPlayerInfo(obj);
+        var info = new UINetworkPlayerInfo(netIdentity, obj);
 
         var writer = new NetworkWriter();
             writer.WritePlayerInfo(info);
@@ -63,23 +74,25 @@ public class UILobbyController : NetworkBehaviour, IUILobbyController
     private void CmdTransferPlayerInfo(byte[] info)
     {
         var reader = new NetworkReader(info);
-        var item = reader.ReadPlayerInfo();
+        var playerInfo = reader.ReadPlayerInfo();
 
-        Debug.Log($"UINetworkMenu.CmdItem: Name is { item.Name } ");
+        Debug.Log($"UILobbyController.CmdTransferPlayerInfo");
+
+        SceneDataBus.SendContext(new LobbyPlayerInfo(playerInfo));
     }
 
     #endregion
 
     #region Server
 
-    public void StartServer()
+    public void ShowServerUI()
     {
-        
+        _serverMenu.Enable();
     }
 
-    public void StopServer()
+    public void HideServerUI()
     {
-        
+        _serverMenu.Disable();
     }
 
 

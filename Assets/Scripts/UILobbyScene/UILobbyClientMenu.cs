@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class UILobbyClientMenu : MonoBehaviour
+public class UILobbyClientMenu : MonoBehaviour, IEnabable, IDisabable
 {
     [SerializeField] private TMP_InputField _clientName;
     [SerializeField] private Button _addBtn;

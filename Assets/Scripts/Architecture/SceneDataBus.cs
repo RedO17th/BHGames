@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
+using Mirror;
 
 public static class SceneDataBus
 {
@@ -52,6 +49,21 @@ public class AddLobbyPlayer : BaseContext
     public AddLobbyPlayer(ILobbyPlayer player)
     {
         Player = player;
+    }
+}
+
+public class ServerLoaded : BaseContext
+{
+    public ServerLoaded() { }
+}
+
+public class LobbyPlayerInfo : BaseContext
+{
+    public IUINetworkPlayerInfo Info { get; private set; }
+
+    public LobbyPlayerInfo(IUINetworkPlayerInfo info)
+    {
+        Info = info;
     }
 }
 #endregion

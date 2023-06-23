@@ -53,9 +53,13 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         _lobbyPlayers = new List<BaseNetworkLobbyPlayer>();
 
         InitializeSubSystems();
-        PrepareSubSystems();
+        SubScribeSubSystems();
+        StartSubSystems();
 
         SceneDataBus.OnContextEvent += ProcessContextEvent;
+
+        //Отправить Event о том, что Сервер загрузился
+        SceneDataBus.SendContext(new ServerLoaded());
     }
 
     private void InitializeSubSystems()
@@ -65,12 +69,18 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
             system.Initialize(this);
         }
     }
-
-    private void PrepareSubSystems()
+    private void SubScribeSubSystems()
     {
         foreach (var system in _subSystems)
         {
-            system.Prepare();
+            system.SubScribe();
+        }
+    }
+    private void StartSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.StartSystem();
         }
     }
 
@@ -79,7 +89,26 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         SceneDataBus.OnContextEvent -= ProcessContextEvent;
 
         _sceneHandler = null;
+
+        UnSubScribeSubSystems();
+        StopSubSystems();
     }
+    private void UnSubScribeSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.UnSubScribe();
+        }
+    }
+    private void StopSubSystems()
+    {
+        foreach (var system in _subSystems)
+        {
+            system.StopSystem();
+        }
+    }
+
+
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
         Debug.Log($"LobbyNetworkManager.OnServerConnect");
@@ -92,7 +121,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
         {
             var lobbyPlayer = Instantiate(_roomPlayerPrefab);
                 lobbyPlayer.SetParent(transform);
-                lobbyPlayer.SetName(Random.Range(0, 101).ToString());
+                //lobbyPlayer.SetName(Random.Range(0, 101).ToString());
 
             _lobbyPlayers.Add(lobbyPlayer);
 
@@ -112,6 +141,25 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
                 Debug.Log($"LobbyNetworkManager.ProcessContextEvent");
 
                 StartCoroutine(Timer());
+            }
+        }
+
+        if (context is LobbyPlayerInfo iContext)
+        {
+            Debug.Log($"LobbyNetworkManager.ProcessContextEvent: iContext");
+
+            var lobbyPlayerInfo = iContext.Info;
+
+            foreach (var player in _lobbyPlayers)
+            {
+                if (player.Connection == lobbyPlayerInfo.Identity.connectionToClient)
+                {
+                    Debug.Log($"LobbyNetworkManager.ProcessContextEvent: Player is {lobbyPlayerInfo.Name} ");
+                }
+                else
+                {
+                    Debug.Log($"LobbyNetworkManager.ProcessContextEvent: No match by Connection");
+                }
             }
         }
     }
