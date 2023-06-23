@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 98205588}
   - component: {fileID: 98205589}
   m_Layer: 5
-  m_Name: UILobbyLoginMenu
+  m_Name: UIOfflineLoginMenuController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -867,7 +867,7 @@ GameObject:
   - component: {fileID: 481743919}
   - component: {fileID: 481743918}
   m_Layer: 5
-  m_Name: UINetworkMenu
+  m_Name: UILobbyController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -910,6 +910,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
+  _serverMenu: {fileID: 1631069858}
   _clientMenu: {fileID: 1665831733}
 --- !u!114 &481743919
 MonoBehaviour:
@@ -1739,7 +1740,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 625337364}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f20845ad69af4a4789b7518246a98a3, type: 3}
+  m_Script: {fileID: 11500000, guid: c475ce46e91206549916b563a4428ce4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _adress: {fileID: 492622257}
@@ -3866,6 +3867,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1631069856}
   - component: {fileID: 1631069857}
+  - component: {fileID: 1631069858}
   m_Layer: 5
   m_Name: ServerMenu
   m_TagString: Untagged
@@ -3901,6 +3903,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1631069855}
   m_CullTransparentMesh: 1
+--- !u!114 &1631069858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1631069855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f02c36ee0995ac4aa37aee7a0e46f96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1665831729
 GameObject:
   m_ObjectHideFlags: 0

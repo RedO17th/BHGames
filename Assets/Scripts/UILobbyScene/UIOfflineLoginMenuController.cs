@@ -2,13 +2,13 @@ using Mirror;
 using System;
 using UnityEngine;
 
-public class UILobbyLoginMenu : MonoBehaviour
+public class UIOfflineLoginMenuController : MonoBehaviour
 {
     [SerializeField] private LobbyNetworkManager _networkManager;
 
     //Привести к массиву
-    [SerializeField] private BaseServerMenu _serverPanel;
-    [SerializeField] private BaseClientMenu _clientPanel;
+    [SerializeField] private BaseOfflineServerMenu _serverPanel;
+    [SerializeField] private BaseOfflineClientMenu _clientPanel;
 
     private void OnEnable() => DefinePanelByRole();
     private void DefinePanelByRole()

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using System;
 
-public class UINetworkClientMenu : MonoBehaviour
+public class UILobbyClientMenu : MonoBehaviour
 {
     [SerializeField] private TMP_InputField _clientName;
     [SerializeField] private Button _addBtn;

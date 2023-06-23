@@ -6,19 +6,15 @@ using static UnityEditor.Progress;
 
 public interface IUINetworkPlayerInfo
 {
-    //NetworkIdentity Identity { get; }
     string Name { get; }
 }
 
 public class UINetworkPlayerInfo : IUINetworkPlayerInfo
 {
-    //public NetworkIdentity Identity { get; private set; }
     public string Name { get; private set; }
 
-    //public UINetworkPlayerInfo(NetworkIdentity identity, string name)
     public UINetworkPlayerInfo(string name)
     {
-        //Identity = identity;
         Name = name;
     }
 }

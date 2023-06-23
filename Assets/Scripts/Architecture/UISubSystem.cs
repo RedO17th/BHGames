@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UISubSystem : BaseNetworkSubSystem
 {
-    [SerializeField] private UINetworkLobbyMenu _networkMenu = null;
+    [SerializeField] private UILobbyController _networkMenu = null;
 
     private LobbyNetworkManager _lobbyManager = null;
 
@@ -14,14 +14,6 @@ public class UISubSystem : BaseNetworkSubSystem
     {
         _lobbyManager = lobbyManager as LobbyNetworkManager;
     }
-
-     
-
-    //[TargetRpc]
-    //private void SomeMeth(NetworkConnectionToClient target)
-    //{ 
-        
-    //}
 
     public override void Prepare() 
     {
@@ -32,9 +24,16 @@ public class UISubSystem : BaseNetworkSubSystem
     {
         if (cntxt is AddLobbyPlayer context)
         {
-            _networkMenu.Enable();
-            _networkMenu.StartClient();
+            TRpcEnableUIMenuByRole(context.Player.Connection);
         }
+    }
+
+    [TargetRpc]
+    private void TRpcEnableUIMenuByRole(NetworkConnectionToClient connection)
+    {
+        //Где включать данный контроллер... При включении нужного состояния.
+        _networkMenu.Enable();
+        _networkMenu.StartClient();
     }
 
     public override void Stop() { }

@@ -47,9 +47,11 @@ public class NewClient : BaseContext
 
 public class AddLobbyPlayer : BaseContext
 {
-    public AddLobbyPlayer()
-    {
+    public ILobbyPlayer Player { get; private set; }
 
+    public AddLobbyPlayer(ILobbyPlayer player)
+    {
+        Player = player;
     }
 }
 #endregion

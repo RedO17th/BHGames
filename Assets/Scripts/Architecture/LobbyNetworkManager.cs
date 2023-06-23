@@ -98,7 +98,7 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
 
             NetworkServer.AddPlayerForConnection(conn, lobbyPlayer.gameObject);
 
-            SceneDataBus.SendContext(new AddLobbyPlayer());
+            SceneDataBus.SendContext(new AddLobbyPlayer(lobbyPlayer));
         }
     }
 

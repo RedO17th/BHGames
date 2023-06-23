@@ -15,7 +15,7 @@ public class ClientLoggin
     }
 }
 
-public class BaseClientMenu : MonoBehaviour
+public class BaseOfflineClientMenu : MonoBehaviour
 {
     [SerializeField] private TMP_InputField _adress;
     [SerializeField] private Button _connectBtn;

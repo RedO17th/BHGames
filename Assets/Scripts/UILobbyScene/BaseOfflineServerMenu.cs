@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 
-public class BaseServerMenu : MonoBehaviour
+public class BaseOfflineServerMenu : MonoBehaviour
 {
     [SerializeField] private TMP_InputField _adress;
     [SerializeField] private Button _runBtn;
