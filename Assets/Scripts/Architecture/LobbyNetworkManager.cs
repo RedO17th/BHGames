@@ -84,7 +84,6 @@ public class LobbyNetworkManager : NetworkManager, ILobbyNetManager
     {
         Debug.Log($"LobbyNetworkManager.OnServerConnect");
     }
-
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         Debug.Log($"LobbyNetworkManager.OnServerAddPlayer");

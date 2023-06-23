@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UISubSystem : BaseNetworkSubSystem
 {
-    [SerializeField] private UINetworkMenu _networkMenu = null;
+    [SerializeField] private UINetworkLobbyMenu _networkMenu = null;
 
     private LobbyNetworkManager _lobbyManager = null;
 
@@ -28,23 +28,13 @@ public class UISubSystem : BaseNetworkSubSystem
         SceneDataBus.OnContextEvent += ProcessContext;
     }
 
-    [ClientCallback]
-    private void OnEnable() => Debug.Log($"UISubSystem.LogMsg: OnEnable ");
-
     private void ProcessContext(BaseContext cntxt)
     {
         if (cntxt is AddLobbyPlayer context)
         {
-            //_networkMenu.Enable();
-
-            LogMsg("Context");
+            _networkMenu.Enable();
+            _networkMenu.StartClient();
         }
-    }
-
-    [ClientRpc]
-    private void LogMsg(string msg)
-    {
-        Debug.Log($"UISubSystem.LogMsg: {msg} ");
     }
 
     public override void Stop() { }
